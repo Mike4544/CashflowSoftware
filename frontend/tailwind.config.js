@@ -1,10 +1,14 @@
-module.exports = {   
-    content: ['./src/**/*.{html,js}'],   
-    theme: {
-        // colors: {
-        //     'primary': '#fafafa',
-        //     'secundary': '#94a3b8',
-        //     'accent': '#1d4ed8'
-        // }
-    }, 
-};
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./templates/**/*.html",
+    "./static/js/components/**/*.js"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
+}
+

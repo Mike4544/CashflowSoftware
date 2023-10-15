@@ -43,7 +43,7 @@ class Database:
         self.execute(sql, params)
         return self.fetchall()
 
-    async def query_async(self, sql, params=None):
+    async def query_async(self, sql: str, params=None):
         print(sql)
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self.query, sql, params)

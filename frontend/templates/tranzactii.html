@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="{{ url_for('static', filename='js/components/stats-container.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/operation-riboon.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/table.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/text-input.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/data-dropdown.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/button.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/spinner.js') }}"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tranzactii | Helion Finance</title>
+  </head>
+  <body class="overflow-auto h-screen w-screen">
+    <div id="app-grid" class="flex">
+      <aside id="sidenav" class="col-span-1">
+        <!--    LG NAV  -->
+        <div
+          class="sm:hidden lg:flex h-screen flex-col justify-between border-e bg-white" style="@media screen and (max-width: 600px) {
+            visibility: hidden !important;
+          }">
+          <div class="px-4 py-6">
+            <span
+              class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600"
+            >
+              Logo
+            </span>
+
+            <ul class="mt-6 space-y-1 pb-2 border-b">
+              <li>
+                <a
+                  href="/acasa"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Acasa
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/tranzactii"
+                  class="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
+                >
+                  Tranzactii
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/salariati"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Salariati
+                </a>
+              </li>
+            </ul>
+
+            <div class="border-t">
+              <a
+                href="/upload"
+                class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                id="uploadDocument"
+              >
+                <span class="text-sm font-medium"> Incarca document </span>
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="icon icon-tabler icon-tabler-upload"
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+                  <path d="M7 9l5 -5l5 5"></path>
+                  <path d="M12 4l0 12"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!--    MD NAV  -->
+        <div
+          class="lg:hidden flex h-screen w-16 flex-col justify-between border-e bg-white"
+        >
+          <div>
+            <div class="inline-flex h-16 w-16 items-center justify-center">
+              <span
+                class="grid h-10 w-10 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600"
+              >
+                L
+              </span>
+            </div>
+
+            <div class="border-t border-gray-100">
+              <div class="px-2">
+                <div class="py-4">
+                  <a
+                    href="/acasa"
+                    class="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-home-2"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                      <path d="M10 12h4v4h-4z" />
+                    </svg>
+
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Acasa
+                    </span>
+                  </a>
+                </div>
+
+                <ul class="space-y-1 border-t border-b border-gray-100 py-4">
+                  <li>
+                    <a
+                      href="/tranzactii"
+                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="icon icon-tabler icon-tabler-file-invoice"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                        <path
+                          d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                        ></path>
+                        <path d="M9 7l1 0"></path>
+                        <path d="M9 13l6 0"></path>
+                        <path d="M13 17l2 0"></path>
+                      </svg>
+
+                      <span
+                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      >
+                        Tranzactii
+                      </span>
+                    </a>
+                  </li>
+
+                  <li>
+                    <a
+                      href="/salariati"
+                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="icon icon-tabler icon-tabler-users"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                        <path
+                          d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"
+                        ></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+                      </svg>
+
+                      <span
+                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      >
+                        Salariati
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+
+                <div class="border-t py-4">
+                  <a
+                    href="/upload"
+                    id="uploadDocument"
+                    class="t group relative flex justify-center rounded bg-blue-700 px-2 py-1.5 text-white"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-upload"
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <path
+                        d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+                      ></path>
+                      <path d="M7 9l5 -5l5 5"></path>
+                      <path d="M12 4l0 12"></path>
+                    </svg>
+
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Incarca document
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div id="app-content" class="col-span-4 p-12 flex-col grow">
+        <div class="top-content h-12 mb-10">
+          <div class="header-row flex mb-2">
+            <div class="page-icon mr-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-file-invoice"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                <path
+                  d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                ></path>
+                <path d="M9 7l1 0"></path>
+                <path d="M9 13l6 0"></path>
+                <path d="M13 17l2 0"></path>
+              </svg>
+            </div>
+            <h1 class="page-header text-lg font-medium">Tranzactii</h1>
+          </div>
+          <hr />
+        </div>
+
+        <!--    TODO: Make the rest of the components    -->
+        <!--    THE SEARCH STUFF    -->
+        <div
+          class="search-row flex flex-wrap mb-10 pb-5 border-b-2 justify-between"
+        >
+          <div class="form-group flex mb-5">
+            <!--    SEARCH BAR  -->
+            <div id="searchBar">
+
+            </div>
+
+            <!--    DATA    -->
+           
+            <div id="selectZi"></div>
+
+            <div id="selectLuna"></div>
+
+            <div id="selectAn"></div>
+          </div>
+
+          <!--    SEARCH QUERY    -->
+          <div id="searchButton"></div>
+        </div>
+
+        <!--    THE TABLES   -->
+        <div class="tranzactii-tables grid grid-cols-5 gap-10">
+          <div class="intrari-tabel col-span-2">
+            <h3 class="text-lg font-medium mb-5">Intrari</h3>
+
+            <!-- TABEL INTRARI  -->
+            <div id="tabelIntrari"></div>
+          </div>
+
+          <div class="iesiri-tabel col-span-2">
+            <h3 class="text-lg font-medium mb-5">Iesiri</h3>
+            <div id="tabelIesiri"></div>
+          </div>
+
+          <div class="total-tabel">
+            <h3 class="text-lg font-medium mb-5">Total</h3>
+
+            <div id="tabelTotal"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--  Render pipeline -->
+    <script async>
+
+      let searchBar = TextInput.create(
+        "#searchBar",
+        "search",
+        "Cauta Date",
+        "Solceta SRL.",
+        "text",
+        "false",
+        `
+        <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                  <path d="M21 21l-6 -6"></path>
+                </svg>
+        `
+      );
+
+      // let ziDropdown = DataDropdown.create(
+      //   '#selectZi',
+      //   "SelectZi",
+      //   "Zi",
+      //   Array(31).fill().map((_, i) => i + 1),
+      // );
+      let ziInput = TextInput.create(
+        "#selectZi",
+        "search",
+        "Zi",
+        "Introduceti ziua",
+        "number",
+      );
+
+      let lunaInput = TextInput.create(
+        "#selectLuna",
+        "search",
+        "Zi",
+        "Introduceti luna",
+        "number",
+      );
+
+      let anInput = TextInput.create(
+        "#selectAn",
+        "search",
+        "Zi",
+        "Introduceti anul",
+        "number",
+      );
+
+
+      let searchButton = Button.create(
+        "#searchButton",
+        "Cauta",
+        `
+        <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+              <path d="M21 21l-6 -6"></path>
+            </svg>
+        `,
+        search
+      );
+
+
+      function search() {
+
+        //  Update the tables with a spinner
+        tabelIntrari.update([[SpinnerElement]]);
+        tabelIesiri.update([[SpinnerElement]]);
+        tabelTotal.update([[SpinnerElement]]);
+
+        let data = {
+          "luni": lunaInput.getValue === "" ? null : [lunaInput.getValue],
+          "firme": searchBar.getValue === "" ? null : [searchBar.getValue],
+          "ani": anInput.getValue === "" ? null : [anInput.getValue],
+        };
+
+        //  Get the new data
+        getTableData(data);
+      }
+
+
+      let tabelIntrari = OperationsTable.create(
+        "#tabelIntrari",
+        ["Zi", "Luna", "An", "Firma", "Valoare"],
+        [[SpinnerElement]]
+      );
+
+      let tabelIesiri = OperationsTable.create(
+        "#tabelIesiri",
+        ["Zi", "Luna", "An", "Firma", "Valoare"],
+        [[SpinnerElement]]
+      );
+
+      let tabelTotal = OperationsTable.create(
+        "#tabelTotal",
+        ["Valoare"],
+        [[SpinnerElement]]
+      );
+
+      /**
+       *  Get the data from the server
+       *
+       * @param {string} type
+       * @param {string} luni
+       * @param {Array} firme
+       * @param {Array} ani
+       */
+      async function getData(
+        type = "intrari",
+        dataJSON
+      ) {
+        let endpoint = type === "intrari" ? "getIntrari" : "getIesiri";
+
+        //  Get the entries from the /api/cashflow/getEntries
+        let data = fetch("/api/cashflow/" + endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(dataJSON),
+        })
+          .then(async (data) => {
+            let jsonData = await data.json();
+            return jsonData;
+          })
+          .then((jsonData) => {
+            console.log(jsonData);
+
+            let updatedData = [];
+
+            Object.keys(jsonData).map((key) => {
+              updatedData.push([
+                jsonData[key]["zi"],
+                jsonData[key]["luna"],
+                jsonData[key]["an"],
+                new Dropdown("Detalii", [
+                  new StaticTable(
+                    ["Firma", "Valori"],
+                    [
+                      ...Object.keys(jsonData[key]["firme"]).map((firma) => {
+                        console.log([firma, jsonData[key]["firme"][firma]]);
+                        return [firma, jsonData[key]["firme"][firma]];
+                      }),
+                    ],
+                    false
+                  ).tableElement,
+                ]).htmlElement,
+
+                jsonData[key]["suma"],
+              ]);
+            });
+
+            return updatedData;
+          });
+
+          return data;
+      }
+
+      async function getTableData(
+        dataJSON = {
+          luni: null,
+          firme: null,
+          ani: null,
+        }
+      ) {
+        Promise.all([getData("intrari", dataJSON), getData("iesiri", dataJSON)]).then((data) => {
+
+          tabelIntrari.update(data[0]);
+          tabelIesiri.update(data[1]);
+
+          let dataTotal = data[0].reduce((acc, curr) => {
+            return acc + curr[4];
+          }, 0) - data[1].reduce((acc, curr) => {
+            return acc + curr[4];
+          }, 0);
+
+          tabelTotal.update([[`<b>${dataTotal} RON</b>`]]);
+        });
+      }
+
+      getTableData();
+    </script>
+  </body>
+</html>
