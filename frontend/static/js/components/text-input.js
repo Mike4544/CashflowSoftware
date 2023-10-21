@@ -7,7 +7,7 @@ class TextInput {
     }
 
     __init(
-        elementID, formID, label, placeholder, type = 'text', required = false, svg = null,
+        elementID, formID, label, placeholder, type = 'text', required = false, svg = null, onChange = null
     ) {
 
         const INNER_HTML = `
@@ -34,29 +34,44 @@ class TextInput {
             INNER_HTML, 'text/html'
         ).body.firstElementChild;
 
-        let parent = document.querySelector(`${elementID}`);
-        parent.appendChild(element);
+        try {
+            let parent = document.querySelector(`${elementID}`);
+            parent.appendChild(element);
+        }
+        catch {
+            console.log('The elementID is not valid.');
+        }
+
+        //  Add the onChange event listener
+        if(onChange != null) {
+            element.querySelector('input').addEventListener('input', onChange);
+        }
         
         //  console.log(element);
         return element;
 
     }
 
-    get getValue() {
+    get value() {
         return this.htmlElement.querySelector('input').value;
     }
 
-    set setValue(text) {
+    set value(text) {
         this.htmlElement.querySelector('input').value = text;
+    }
+
+    set placeholder(text) {
+        this.htmlElement.querySelector('input').placeholder = text;
     }
 
 
     static create(
-        elementID, formID, label, placeholder, type = 'text', required = false, svg = null,
+        elementID, formID, label, placeholder, type = 'text', required = false, svg = null, onChange = null
     ) {
+
         let textInput = new TextInput();
         textInput.htmlElement = textInput.__init(
-            elementID, formID, label, placeholder, type, required, svg
+            elementID, formID, label, placeholder, type, required, svg, onChange
         );
 
         //  console.log(textInput.htmlElement);

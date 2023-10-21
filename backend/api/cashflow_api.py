@@ -6,6 +6,8 @@ This file contains the API for the cashflow database
 The database contains three tables:
     - Intrari
     - Iesiri
+    - DateLunare
+    - ConturiBancare
     - Config
     
 The Intrari table contains the following columns:
@@ -22,6 +24,20 @@ The Iesiri table contains the following columns:
     |   INT |   'Iesire'   |   INT  |   INT     |   INT    |  VARCHAR     |   FLOAT   | FLOAT |   FLOAT   |
     
 
+The DateLunare table contains the following columns:
+    -------------------------------------------------
+    |   ID  |   Luna    |   An  |   SumaInitiala    |
+    -------------------------------------------------
+    |   INT |   INT     |   INT |   FLOAT           |
+
+
+The ConturiBancare table contains the following columns:
+    -------------------------------------------------
+    |   ID  |   Banca   |   Sold    |
+    -------------------------------------------------
+    |   INT |   VARCHAR |   FLOAT   |
+
+
 The Config table contains the following columns:
     ---------------------------------------------
     |   ID  |   Parola_Useri    |   Parola_Admin |
@@ -32,7 +48,7 @@ The Config table contains the following columns:
 :author:    Mihai Tira
 """
 
-from pypika import Query, Table, Field, Order
+from pypika import Query, Table, Field, Order, Case
 from datetime import datetime
 
 DB_PATH = 'backend/database/cashflow.db'
@@ -46,6 +62,8 @@ async def create_cashflow_table() -> bool:
 
     try:
         with Database(DB_PATH) as db:
+
+            #   Tabele intrari-iesiri
             db.execute("""
             CREATE TABLE IF NOT EXISTS Intrari (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -54,9 +72,9 @@ async def create_cashflow_table() -> bool:
                 Luna INTEGER NOT NULL,
                 An INTEGER NOT NULL,
                 Companie VARCHAR(255),
-                Valoare DECIMAL(10, 2),
-                TVA DECIMAL(10, 2),
-                Total DECIMAL(10, 2)
+                Valoare DECIMAL(10, 3),
+                TVA DECIMAL(10, 3),
+                Total DECIMAL(10, 3)
             );
             """)
 
@@ -68,15 +86,42 @@ async def create_cashflow_table() -> bool:
                 Luna INTEGER NOT NULL,
                 An INTEGER NOT NULL,
                 Companie VARCHAR(255),
-                Valoare DECIMAL(10, 2),
-                TVA DECIMAL(10, 2),
-                Total DECIMAL(10, 2)
+                Valoare DECIMAL(10, 3),
+                TVA DECIMAL(10, 3),
+                Total DECIMAL(10, 3)
                 );
             """)
-    except:
+
+            #   Tabela date lunare
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS DateLunare (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Luna INTEGER NOT NULL,
+                    An INTEGER NOT NULL,
+                    SumaInitiala DECIMAL(10, 3) DEFAULT 0
+                );
+                """
+            )
+
+            #   Tabela config cont bancar
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS ConturiBancare (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Banca VARCHAR(255),
+                    Sold INTEGER DEFAULT 0
+                );
+                """
+            )
+
+    except Exception as e:
+        print(e)
         return False
 
     return True
+
+
 
 
 #   Create operations   -   ASYNC
@@ -278,12 +323,91 @@ async def insert_iesire_many(
         print(e)
         return []
 
+async def insert_date_lunare(
+        luna: int,
+        an: int,
+        suma_initiala: float,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    """
+    Insert a new entry into the DateLunare table
+    :param luna: Luna
+    :param an: An
+    :param suma_initiala: Suma initiala
+    :return: Boolean value indicating if the entry was inserted or not
+    """
+
+    try:
+        if db_connection:
+            query = Query.into(
+                'DateLunare'
+            ).columns(
+                'Luna', 'An', 'SumaInitiala'
+            ).insert(
+                luna, an, suma_initiala
+            )
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.into(
+                'DateLunare'
+            ).columns(
+                'Luna', 'An', 'SumaInitiala'
+            ).insert(
+                luna, an, suma_initiala
+            )
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+async def insert_cont_bancar(
+        banca: str,
+        sold: float,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    try:
+        if db_connection:
+            query = Query.into(
+                'ConturiBancare'
+            ).columns(
+                'Banca', 'Sold'
+            ).insert(
+                banca, sold
+            )
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.into(
+                'ConturiBancare'
+            ).columns(
+                'Banca', 'Sold'
+            ).insert(
+                banca, sold
+            )
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+
+#   =================================================================
+#   =================================================================
+
 
 #   Read operations     -   ASYNC
 async def get_intrari(
-        luni: list[int] = None,
-        ani: list[str] = None,
-        firme: list[str] = None,
+        luna: int= None,
+        an: int = None,
+        firma: str = None,
         db_connection: Database = None
 ) -> list[list[tuple]]:
 
@@ -299,9 +423,10 @@ async def get_intrari(
 
         print(query.get_sql())
 
-        if luni:
+        if luna:
+            luna = int(luna)
             query = query.where(
-                table.Luna.isin(luni)
+                table.Luna == luna
             )
         else:
             query = query.where(
@@ -309,18 +434,19 @@ async def get_intrari(
             )
 
 
-        if ani:
+        if an:
+            an = int(an)
             query = query.where(
-                table.Ani.isin(ani)
+                table.An == an
             )
         else:
             query = query.where(
-                table.Ani == datetime.now().year
+                table.An == datetime.now().year
             )
 
-        if firme:
+        if firma:
             query = query.where(
-                table.Companie.isin(firme)
+                table.Companie == firma
             )
 
         if db_connection:
@@ -336,9 +462,9 @@ async def get_intrari(
         return []
 
 async def get_iesiri(
-        luni: list[int] = None,
-        ani: list[str] = None,
-        firme: list[str] = None,
+        luna: int = None,
+        an: int = None,
+        firma: str = None,
         db_connection: Database = None
 ) -> list[list[tuple]]:
 
@@ -353,27 +479,29 @@ async def get_iesiri(
         table = Table('Iesiri')
         query = Query.from_(table).select('*')
 
-        if luni:
+        if luna:
+            luna = int(luna)
             query = query.where(
-                table.Luna.isin(luni)
+                table.Luna == luna
             )
         else:
             query = query.where(
                 table.Luna == datetime.now().month
             )
 
-        if ani:
+        if an:
+            an = int(an)
             query = query.where(
-                table.Luna.isin(luni)
+                table.An == an
             )
         else:
             query = query.where(
                 table.An == datetime.now().year
             )
 
-        if firme:
+        if firma:
             query = query.where(
-                table.Companie.isin(firme)
+                table.Companie == firma
             )
 
 
@@ -387,7 +515,6 @@ async def get_iesiri(
     except Exception as e:
         print(e)
         return []
-
 
 async def get_recent_operations(
         limit: int,
@@ -428,35 +555,73 @@ async def get_recent_operations(
         print(e)
         return []
 
-async def get_total_difference(
-        companii: list[str] | int,
+async def get_date_lunare(
+        luna: int = None,
+        an: int = None,
         db_connection: Database = None
-) -> list[list[tuple]]:
+) -> tuple:
 
     """
-    Get the total difference of the entries from the joined tables
-    :param companii: Companiile dorite (daca e -1, se vor returna toate intrarile)
+    Get the most recent operations
+    :param limit: Limit of operations
     :return: List of entries
     """
 
     try:
-        with Database(DB_PATH) as db:
-            if companii == -1:
-                return await db.query_async("""
-                SELECT SUM(Intrari.Total) - SUM(Iesiri.Total) AS TotalDifference, Intrari.Companie
-                FROM Intrari
-                JOIN Iesiri ON Intrari.Companie = Iesiri.Companie;
-                """)
-            else:
-                return await db.query_async("""
-                SELECT SUM(Intrari.Total) - SUM(Iesiri.Total) AS TotalDifference, Intrari.Companie
-                FROM Intrari
-                JOIN Iesiri ON Intrari.Companie = Iesiri.Companie
-                WHERE Intrari.Companie IN (?);
-                """, (companii,))
+        table = Table('DateLunare')
+        query = Query.from_(table).select('SumaInitiala')
 
-    except:
+        if luna:
+            luna = int(luna)
+            query = query.where(
+                table.Luna == luna
+            )
+        else:
+            query = query.where(
+                table.Luna == datetime.now().month
+            )
+
+        if an:
+            an = int(an)
+            query = query.where(
+                table.An == an
+            )
+        else:
+            query = query.where(
+                table.An == datetime.now().year
+            )
+
+        if db_connection:
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return ()
+
+async def get_conturi_bancare(
+        db_connection: Database = None
+) -> list[tuple]:
+
+    try:
+        table = Table('ConturiBancare')
+        query = Query.from_(table).select('Banca', 'Sold')
+
+        if db_connection:
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
         return []
+
+
+#   =================================================================
+#   =================================================================
 
 
 #   Update operations   -   ASYNC
@@ -482,7 +647,10 @@ async def update_intrari(
     #     return []
     raise NotImplementedError
 
-async def update_iesiri(data: str, companie: str, values: tuple) -> list[list[tuple]]:
+async def update_iesiri(
+        data: tuple[int, int, int],
+        companie: str,
+        values: tuple) -> list[list[tuple]]:
     """
     Update an entry from the Iesiri table
     :param data: Data dorita pentru update (daca e ALL, se vor updata toate intrarile)
@@ -511,9 +679,47 @@ async def update_iesiri(data: str, companie: str, values: tuple) -> list[list[tu
     #     return []
     raise NotImplementedError
 
+async def update_date_lunare(
+        luna: int,
+        an: int,
+        suma_initiala: float,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    """
+    Update an entry from the DateLunare table
+    :param luna: Luna
+    :param an: An
+    :param suma_initiala: Suma initiala
+    :return: Boolean value indicating if the entry was inserted or not
+    """
+
+    try:
+        if db_connection:
+            query = Query.update('DateLunare')\
+                .set('SumaInitiala', suma_initiala)\
+                .where(
+                    (Field('Luna') == luna) & (Field('An') == an)
+                )
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.update('DateLunare')\
+                .set('SumaInitiala', suma_initiala)\
+                .where(
+                    (Field('Luna') == luna) & (Field('An') == an)
+                )
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
 
 #   Delete operations
-async def delete_intrari(
+async def delete_intrare(
         data: str | tuple[int, int, int],
         companie: str
 ) -> list[list[tuple]]:
@@ -542,7 +748,7 @@ async def delete_intrari(
     except:
         return []
 
-async def delete_iesiri(data: str | tuple[int, int, int], companie: str) -> list[list[tuple]]:
+async def delete_iesire(data: str | tuple[int, int, int], companie: str) -> list[list[tuple]]:
     """
     Delete an entry from the Iesiri table
     :param data: Data dorita pentru delete (daca e ALL, se vor sterge toate intrarile)
@@ -559,13 +765,27 @@ async def delete_iesiri(data: str | tuple[int, int, int], companie: str) -> list
 
             table = Table('Iesiri')
             query = Query.from_(table).where(
-                table.Zi == data[0] & table.Luna == data[1] & table.An == data[2] & table.Companie == companie
-            )
+                (table.Zi == data[0]) & (table.Luna == data[1]) & (table.An == data[2]) & (table.Companie == companie)
+            ).delete()
 
             return await db.query_async(query.get_sql())
 
-    except:
+    except Exception as e:
+        print(e)
         return []
 
+async def delete_cont_bancar(banca: str) -> list[list[tuple]]:
 
+    try:
+        with Database(DB_PATH) as db:
 
+            table = Table('ConturiBancare')
+            query = Query.from_(table).where(
+                table.Banca == banca
+            ).delete()
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []

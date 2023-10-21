@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <!--  META  -->
     <meta charset="UTF-8" />
+    <meta name="viewport" content="height=device-height, 
+                      width=device-width, initial-scale=1.0, 
+                      minimum-scale=1.0, maximum-scale=1.0, 
+                      user-scalable=no, target-densitydpi=device-dpi">
+    <!--  SCRIPTS -->
     <script src="{{ url_for('static', filename='js/components/stats-container.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/operation-riboon.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/table.js') }}"></script>
@@ -10,19 +16,29 @@
     <script src="{{ url_for('static', filename='js/components/data-dropdown.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/button.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/spinner.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/icons.js') }}"></script>
+
+    <!--  CDNS  -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='dist/css/output.css') }}"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tranzactii | Helion Finance</title>
   </head>
   <body class="overflow-auto h-screen w-screen">
     <div id="app-grid" class="flex">
-      <aside id="sidenav" class="col-span-1">
+      <aside id="sidenav" class="col-span-1 h-screen fixed">
         <!--    LG NAV  -->
         <div
-          class="sm:hidden lg:flex h-screen flex-col justify-between border-e bg-white" style="@media screen and (max-width: 600px) {
-            visibility: hidden !important;
-          }">
+          class="hidden lg:flex h-screen flex-col items-start justify-between border-e bg-white"
+          style="
+            @media screen and (max-width: 600px) {
+              visibility: hidden !important;
+            }
+          "
+        >
           <div class="px-4 py-6">
             <span
               class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600"
@@ -91,7 +107,7 @@
 
         <!--    MD NAV  -->
         <div
-          class="lg:hidden flex h-screen w-16 flex-col justify-between border-e bg-white"
+          class="lg:hidden flex h-screen w-16 flex-col items-start justify-between border-e bg-white"
         >
           <div>
             <div class="inline-flex h-16 w-16 items-center justify-center">
@@ -253,7 +269,7 @@
         </div>
       </aside>
 
-      <div id="app-content" class="col-span-4 p-12 flex-col grow">
+      <div id="app-content" class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56">
         <div class="top-content h-12 mb-10">
           <div class="header-row flex mb-2">
             <div class="page-icon mr-4">
@@ -279,7 +295,12 @@
                 <path d="M13 17l2 0"></path>
               </svg>
             </div>
-            <h1 class="page-header text-lg font-medium">Tranzactii</h1>
+            <h1 class="page-header text-lg font-medium">
+              Tranzactii | 
+              <span id="titluLuna">
+                Data: {{ luna }} - {{ an }}
+              </span>
+            </h1>
           </div>
           <hr />
         </div>
@@ -291,12 +312,10 @@
         >
           <div class="form-group flex mb-5">
             <!--    SEARCH BAR  -->
-            <div id="searchBar">
-
-            </div>
+            <div id="searchBar"></div>
 
             <!--    DATA    -->
-           
+
             <div id="selectZi"></div>
 
             <div id="selectLuna"></div>
@@ -306,6 +325,22 @@
 
           <!--    SEARCH QUERY    -->
           <div id="searchButton"></div>
+        </div>
+
+        <!--  SUMA INITIALA -->
+        <div class="mb-5">
+          <h3 class="text-lg font-medium mb-5">
+            Suma initiala: 
+            <span>
+              <div id="sumaInitiala" class="w-44 inline-block">
+
+              </div>
+
+              <div id="sumaInitiala__edit" class="hidden inline-block">
+
+              </div>
+            </span>
+          </h3>
         </div>
 
         <!--    THE TABLES   -->
@@ -323,9 +358,12 @@
           </div>
 
           <div class="total-tabel">
-            <h3 class="text-lg font-medium mb-5">Total</h3>
+            <h3 class="text-lg font-medium mb-5">Total (zile)</h3>
 
-            <div id="tabelTotal"></div>
+            <div id="tabelTotal" class="mb-10"></div>
+
+            <h3 class="text-lg font-medium mb-5">Total</h3>
+            <div id="tabelLuna" class="mb-10"></div>
           </div>
         </div>
       </div>
@@ -333,14 +371,13 @@
 
     <!--  Render pipeline -->
     <script async>
-
       let searchBar = TextInput.create(
         "#searchBar",
         "search",
         "Cauta Date",
         "Solceta SRL.",
         "text",
-        "false",
+        false,
         `
         <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -372,7 +409,7 @@
         "search",
         "Zi",
         "Introduceti ziua",
-        "number",
+        "number"
       );
 
       let lunaInput = TextInput.create(
@@ -380,7 +417,7 @@
         "search",
         "Zi",
         "Introduceti luna",
-        "number",
+        "number"
       );
 
       let anInput = TextInput.create(
@@ -388,9 +425,8 @@
         "search",
         "Zi",
         "Introduceti anul",
-        "number",
+        "number"
       );
-
 
       let searchButton = Button.create(
         "#searchButton",
@@ -416,34 +452,96 @@
         search
       );
 
-
       function search() {
-
         //  Update the tables with a spinner
         tabelIntrari.update([[SpinnerElement]]);
         tabelIesiri.update([[SpinnerElement]]);
         tabelTotal.update([[SpinnerElement]]);
 
         let data = {
-          "luni": lunaInput.getValue === "" ? null : [lunaInput.getValue],
-          "firme": searchBar.getValue === "" ? null : [searchBar.getValue],
-          "ani": anInput.getValue === "" ? null : [anInput.getValue],
+          luna: lunaInput.value === "" ? null : lunaInput.value,
+          firma: searchBar.value === "" ? null : searchBar.value,
+          an: anInput.value === "" ? null : anInput.value,
         };
 
+        let dataSpan = document.querySelector("#titluLuna");
+
+        dataSpan.innerHTML = `Data: ${lunaInput.value} - ${anInput.value}`;
+
         //  Get the new data
-        getTableData(data);
+        getQueriesData(data);
       }
+
+      async function setDataLunara() {
+        let data = {
+          luna: lunaInput.value === "" ?  new Date().getMonth() + 1 : lunaInput.value,
+          an: anInput.value === "" ? new Date().getFullYear() : anInput.value,
+          suma_noua: sumaInitialaField.value === "" ? -999 : sumaInitialaField.value,
+        };
+
+        fetch(
+          '/api/cashflow/add/date_lunare',
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(data),
+          }
+        ).then(async (data) => {
+          let jsonData = await data.json();
+          return jsonData;
+        })
+          .then((jsonData) => {
+            console.log("Suma initiala status: ", jsonData);
+
+            //  Set the placeholder to the new value
+            sumaInitialaField.placeholder = `${sumaInitialaField.value} RON`;
+            //  Clear the field
+            sumaInitialaField.value = "";
+
+          });
+      }
+
+      let editButton = Button.create(
+        "#sumaInitiala__edit",
+        "Editeaza",
+        null,
+        setDataLunara
+      )
+
+      let sumaInitialaField = TextInput.create(
+        "#sumaInitiala",
+        "search",
+        "Suma initiala",
+        "Loading...",
+        "number",
+        false,
+        null,
+        () => {
+          console.log(sumaInitialaField.value);
+          const element = document.querySelector("#sumaInitiala__edit");
+
+          if(sumaInitialaField.value !== "") {
+            element.classList.remove("hidden");
+          } else {
+            element.classList.add("hidden");
+          }
+        }
+      );
+
 
 
       let tabelIntrari = OperationsTable.create(
         "#tabelIntrari",
-        ["Zi", "Luna", "An", "Firma", "Valoare"],
+        ["Data", "Firma", "Valoare"],
         [[SpinnerElement]]
       );
 
       let tabelIesiri = OperationsTable.create(
         "#tabelIesiri",
-        ["Zi", "Luna", "An", "Firma", "Valoare"],
+        ["Data", "Firma", "Valoare"],
         [[SpinnerElement]]
       );
 
@@ -453,19 +551,22 @@
         [[SpinnerElement]]
       );
 
+      let tabelLuna = OperationsTable.create(
+        "#tabelLuna",
+        ["Valoare"],
+        [[SpinnerElement]]
+      );
+
       /**
        *  Get the data from the server
        *
        * @param {string} type
-       * @param {string} luni
-       * @param {Array} firme
+       * @param {string} luna
+       * @param {Array} firma
        * @param {Array} ani
        */
-      async function getData(
-        type = "intrari",
-        dataJSON
-      ) {
-        let endpoint = type === "intrari" ? "getIntrari" : "getIesiri";
+      async function getTableData(type = "intrari", dataJSON) {
+        let endpoint = type === "intrari" ? "get/intrari" : "get/iesiri";
 
         //  Get the entries from the /api/cashflow/getEntries
         let data = fetch("/api/cashflow/" + endpoint, {
@@ -485,57 +586,222 @@
 
             let updatedData = [];
 
-            Object.keys(jsonData).map((key) => {
-              updatedData.push([
-                jsonData[key]["zi"],
-                jsonData[key]["luna"],
-                jsonData[key]["an"],
-                new Dropdown("Detalii", [
-                  new StaticTable(
-                    ["Firma", "Valori"],
-                    [
-                      ...Object.keys(jsonData[key]["firme"]).map((firma) => {
-                        console.log([firma, jsonData[key]["firme"][firma]]);
-                        return [firma, jsonData[key]["firme"][firma]];
-                      }),
-                    ],
-                    false
-                  ).tableElement,
-                ]).htmlElement,
+            //  We will handle based on the days of the month
+            let monthLUT = {
+              1: 31,
+              2: 28,
+              3: 31,
+              4: 30,
+              5: 31,
+              6: 30,
+              7: 31,
+              8: 31,
+              9: 30,
+              10: 31,
+              11: 30,
+              12: 31
+            };
 
+            let currentMonth = lunaInput.value === "" ? new Date().getMonth() + 1 : lunaInput.value;
+            let currentYear = anInput.value === "" ? new Date().getFullYear() : anInput.value;
+
+            let addEntry = (key) => {
+              //  Create a static table for the dropdown
+              let staticTable = new StaticTable(
+                ["Firma", "Valori"],
+                [],
+                false
+              );
+
+              staticTable.update([
+                //  Map the sums from all the companies
+                ...Object.keys(jsonData[key]["firma"]).map((firma) => {
+                    //  console.log([firma, jsonData[key]["firma"][firma]]);
+                    return [
+                      firma,
+                      jsonData[key]["firma"][firma],
+                      //  Add a delete button
+                      IconButton.create(null, "red-400", TRASH_ICON, (e) => {
+                        //  console.log(e);
+                        //  Update the table with the current firma removed
+                          function _removeUIrow() {
+                            let newData = staticTable.entries.filter((entry) => {
+                            return entry[0] !== firma;
+                          });
+
+                          async function _serverCallback() {
+
+                            let data = {
+                              zi: jsonData[key]["zi"],
+                              luna: jsonData[key]["luna"],
+                              an: jsonData[key]["an"],
+                              companie: firma,
+                            };
+
+                            fetch(
+                              "/api/cashflow/" + "delete/" + (type === "intrari" ? "intrare" : "iesire"),
+                              {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  // 'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: JSON.stringify(data),
+                              }
+                            )
+                              .then(async (data) => {
+                                let jsonData = await data.json();
+                                return jsonData;
+                              })
+                              .then((jsonData) => {
+                                console.log(jsonData);
+                              });
+
+
+                          }
+
+                          staticTable.update(newData);
+
+                          _serverCallback();
+                        }
+
+                        _removeUIrow();
+                      }).htmlElement,
+                    ];
+                  }),
+                ]);
+
+              let dropdown = new Dropdown("Detalii", [
+                staticTable.tableElement,
+              ], false);
+
+              updatedData.push([
+                `${jsonData[key]["zi"]}-${jsonData[key]["luna"]}-${jsonData[key]["an"]}`,
+                dropdown.htmlElement,
                 jsonData[key]["suma"],
               ]);
-            });
+            }
+
+
+            for(let i = 1; i <= monthLUT[currentMonth]; i++) {
+              //  Test if jsonData truly has no data
+              if(Object.keys(jsonData).length === 0) {
+                updatedData.push(["No data found"]);
+                break;
+              }
+
+              if(jsonData[i] === undefined) {
+                updatedData.push([`${i}-${currentMonth}-${currentYear}`, '-', '-']);
+                continue;
+              }
+              addEntry(i);
+            }
 
             return updatedData;
           });
 
-          return data;
+        return data;
       }
+      async function getInitSuma() {
+        let data = fetch(
+          '/api/cashflow/get/date_lunare',
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({
+              luna: lunaInput.value === "" ? null : lunaInput.value,
+              an: anInput.value === "" ? null : anInput.value,
+            }),
+          }
+        ).then(async (data) => {
+          let jsonData = await data.json();
+          return jsonData;
+        })
+          .then((jsonData) => {
+            let sumaInitiala = jsonData["suma_initiala"];
+            return sumaInitiala;
+          });
 
-      async function getTableData(
+        return data;
+      }
+      
+      async function getQueriesData(
         dataJSON = {
-          luni: null,
-          firme: null,
-          ani: null,
+          luna: null,
+          firma: null,
+          an: null,
         }
       ) {
-        Promise.all([getData("intrari", dataJSON), getData("iesiri", dataJSON)]).then((data) => {
+        Promise.all([
+          getTableData("intrari", dataJSON),
+          getTableData("iesiri", dataJSON),
+          getInitSuma()
+        ]).then((data) => {
 
           tabelIntrari.update(data[0]);
           tabelIesiri.update(data[1]);
 
-          let dataTotal = data[0].reduce((acc, curr) => {
-            return acc + curr[4];
-          }, 0) - data[1].reduce((acc, curr) => {
-            return acc + curr[4];
-          }, 0);
+          let sumaInitiala = data[2][0];
+          sumaInitialaField.placeholder = `${sumaInitiala} RON`;
 
-          tabelTotal.update([[`<b>${dataTotal} RON</b>`]]);
+
+          console.log(data);
+
+          // let dataTotal = data[0].reduce((acc, curr) => {
+          //   return acc + curr[4];
+          // }, 0) - data[1].reduce((acc, curr) => {
+          //   return acc + curr[4];
+          // }, 0);
+
+          // console.log(dataTotal);
+
+          // let dataLuna = dataTotal.reduce((acc, curr) => {
+          //   return acc + curr[0];
+          // }, 0);
+
+          // tabelTotal.update([[`<b>${dataTotal} RON</b>`]]);
+          // tabelLuna.update([[`<b>${dataLuna} RON</b>`]]);
+
+          function _getTotalForDays() {
+            let totalDays = [];
+            let updatedData = [];
+
+            for (
+              let day = 0;
+              day < data[0].length;
+              day++
+            ) {
+              let _intrare = data[0][day][2] === '-' ? 0 : data[0][day][2];
+              let _iesire = data[1][day][2] === '-' ? 0 : data[1][day][2];
+
+              let dayTotal = _intrare - _iesire;
+
+              totalDays.push([dayTotal]);
+              updatedData.push([`<b>${dayTotal} RON</b>`]);
+            }
+
+            let total = totalDays.reduce((acc, curr) => {
+              return acc + curr[0];
+            }, 0);
+
+            //  Add the initial sum to the total
+            total += sumaInitiala;
+
+            total = `<b>${total} RON</b>`;
+
+            tabelTotal.update(updatedData);
+            tabelLuna.update([[total]]);
+          }
+
+          _getTotalForDays();
         });
       }
 
-      getTableData();
+      getQueriesData();
     </script>
+    <script src="{{ url_for('static', filename='js/background.js') }}"></script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 from quart import Quart, request, jsonify, render_template
 from backend.flask_api import api_routes
+from datetime import datetime
 
 app = Quart(__name__, static_folder="frontend/static", template_folder="frontend/templates")
 app.register_blueprint(api_routes)
@@ -11,7 +12,11 @@ async def home():
 
 @app.route('/tranzactii')
 async def tranzactii():
-    return await render_template('tranzactii.html')
+    return await render_template(
+        'tranzactii.html',
+        luna=datetime.now().month,
+        an=datetime.now().year
+    )
 
 
 if __name__ == "__main__":

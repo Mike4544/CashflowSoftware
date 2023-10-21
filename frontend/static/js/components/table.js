@@ -116,6 +116,11 @@ class OperationsTable {
         return this.tableElement;
     }
 
+    get getEntries() {
+        return this.entries;
+    }
+
+
 
     /**
      * 
@@ -195,7 +200,9 @@ class StaticTable {
 
         div.appendChild(table);
 
-        this.tableElement = div;
+        console.log(table);
+
+        this.tableElement = table;
     }
 
 
@@ -230,6 +237,7 @@ class StaticTable {
         }
 
         //  Append the body to the table
+        console.log("BODIES:", this.tableElement.tBodies.length);
         this.tableElement.tBodies[0].replaceWith(tbody);
     }
 

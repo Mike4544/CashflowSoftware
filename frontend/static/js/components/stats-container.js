@@ -4,51 +4,43 @@ class StatsContainer {
      * 
      * @param {string} color 
      */
-    constructor(color) {
-        this.title = '';
-        this.value = '';
-        this.color = color;
+    constructor(initVal) {
+        this.value = initVal;
     }
 
   
-    init() {
+    __init(
+        elementID,
+        color,
+        name,
+        initVal
+    ) {
         //  Create the html element and set the skeleton
-        const mainStats = document.querySelector("#stats");
+        const mainStats = document.querySelector(elementID);
 
         var tempDiv = document.createElement('div');
         const innerHTML = `
-        <div class="stats-container relative mr-7 my-5 p-3 h-20 w-48 bg-${this.color} rounded-xl shadow-md">
-            <h3 id="stats-container__title" class="text-xs text-ellipsis font-medium tracking-wide text-white opacity-75">Loading...</h3>
-            <h3 id="stats-container__value" class="text-2xl font-bold text-white">Loading...</h3>
+        <div class="stats-container mr-7 my-5 p-3 h-16 lg:h-20 w-42 lg:w-48 bg-${color} rounded-xl shadow-md">
+            <h3 id="stats-container__title" class="text-xs text-ellipsis font-medium tracking-wide text-white opacity-75">${name}</h3>
+            <h3 id="stats-container__value" class="text-2xl font-bold text-white">${initVal}</h3>
         
         </div>
         `;
 
         tempDiv.innerHTML = innerHTML.trim();
+        let element = tempDiv.firstChild;
 
-        //  Set the element to be accessible by the class
-        this.element = tempDiv.firstChild;
-        //  console.log(this.element);
 
         //  Append the element to the main container
-        mainStats.appendChild(this.element);
+        mainStats.appendChild(element);
+
+        return element;
         
     }
 
-    update() {
+    update(value) {
         //  Update the value
-        this.element.querySelector('#stats-container__value').textContent = this.value;
-
-        //  Update the title
-        this.element.querySelector('#stats-container__title').textContent = this.title;
-    }
-
-    /**
-     * 
-     * @param {Promise} promise 
-     */
-    async refresh(promise) {
-
+        this.elementHTML.querySelector('#stats-container__value').textContent = value;
     }
 
 
@@ -60,18 +52,17 @@ class StatsContainer {
      * @param {Promise} promise
      *  
      */
-    static async create(
+    static create(
+        parentElement,
         color, 
         name, 
-        promise
+        initVal
         ) {
-        const statsContainer = new StatsContainer(color);
-        statsContainer.init();
+        const statsContainer = new StatsContainer(initVal);
+        statsContainer.elementHTML = statsContainer.__init(parentElement, color, name, initVal);
+        
+        return statsContainer;
 
-        statsContainer.title = name;
-        statsContainer.value = await promise;
-
-        statsContainer.update();
     }
 
 }
