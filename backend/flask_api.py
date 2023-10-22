@@ -36,11 +36,8 @@ async def get_intrari():
 
         firme_zi = data[zi].get("firma", {})
 
-        firme_zi[firma] = firme_zi.get(firma, 0)
-        firme_zi[firma] = firme_zi[firma] + suma
-
-        firme_sume = data[zi].get("firme_sume", {})
-        firme_sume[firma] = firme_sume.get(firma, 0) + suma
+        firme_zi[firma] = firme_zi.get(firma, [])
+        firme_zi[firma].append(suma)
 
         suma_zi = data[zi].get("suma", 0)
         suma_zi += suma
@@ -80,11 +77,8 @@ async def get_iesiri():
 
         firme_zi = data[zi].get("firma", {})
 
-        firme_zi[firma] = firme_zi.get(firma, 0)
-        firme_zi[firma] = firme_zi[firma] + suma
-
-        firme_sume = data[zi].get("firme_sume", {})
-        firme_sume[firma] = firme_sume.get(firma, 0) + suma
+        firme_zi[firma] = firme_zi.get(firma, [])
+        firme_zi[firma].append(suma)
 
         suma_zi = data[zi].get("suma", 0)
         suma_zi += suma
@@ -96,6 +90,8 @@ async def get_iesiri():
             "luna": luna,
             "an": an
         }
+
+    print(data)
 
     return jsonify(data)
 
@@ -233,11 +229,52 @@ async def add_cont():
 #   =================================================================
 #   =================================================================
 
+#   UPDATE METHODS
+
+@api_routes.route('/api/cashflow/update/contBancar', methods=['POST'])
+async def update_cont():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.update_cont_bancar(
+            banca=json_data['banca'],
+            sold=json_data['sold']
+        )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+#   ================================================================
+#   ===============================================================
 
 #   DELETE METHODS
 @api_routes.route('/api/cashflow/delete/intrare', methods=['POST'])
 async def delete_intrare():
-    ...
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.delete_intrare(
+            data=(int(json_data['zi']), int(json_data['luna']), int(json_data['an'])),
+            companie=json_data['companie'],
+            suma=json_data['suma']
+        )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
 
 @api_routes.route('/api/cashflow/delete/iesire', methods=['POST'])
 async def delete_iesire():
@@ -247,7 +284,8 @@ async def delete_iesire():
     try:
         await cAPI.delete_iesire(
             data=(int(json_data['zi']), int(json_data['luna']), int(json_data['an'])),
-            companie=json_data['companie']
+            companie=json_data['companie'],
+            suma=json_data['suma']
         )
 
         return jsonify({

@@ -279,7 +279,9 @@
           class="main-content grid lg:grid-cols-2 gap-10 grid-rows-3 lg:grid-rows-2"
         >
           <!--    STATS   -->
-          <div class="bg-secundary min-h-96 max-h-[500px] rounded-lg p-8 bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 bg-blue-100 bg-opacity-25">
+          <div
+            class="bg-secundary min-h-96 max-h-[500px] rounded-lg p-8 bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 bg-blue-100 bg-opacity-25"
+          >
             <h2 class="text-2xl font-semibold mb-5">Sumar luna</h2>
 
             <div id="stats" class="row flex flex-wrap">
@@ -370,7 +372,9 @@
           </div>
 
           <!-- TABEL ANGAJATI -->
-          <div class="bg-secundary min-h-96 max-h-[500px] overflow-auto rounded-lg p-8 bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 bg-blue-100 bg-opacity-25">
+          <div
+            class="bg-secundary min-h-96 max-h-[500px] overflow-auto rounded-lg p-8 bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 bg-blue-100 bg-opacity-25"
+          >
             <h2 class="text-2xl font-semibold mb-5">Solduri in banci</h2>
 
             <div id="tabelBanci"></div>
@@ -434,15 +438,8 @@
                 banca: name,
                 sold: sold,
               }),
-            })
-              .then(async (response) => {
-                let data = await response.json();
-                return data;
-              })
-              .then((data) => {
-                console.log(data);
-                return data;
-              });
+            });
+            let jsonData = await response.json();
 
             console.log(name, sold);
 
@@ -452,46 +449,115 @@
               return;
             }
 
-            data.pop();
-            data.push([
-              name,
-              sold,
-              IconButton.create(null, "red-500", TRASH_ICON, async () => {
-                //  Functia asta va trimite datele catre server
-                //  Trebuie sa verificam daca datele sunt valide
+            async function deleteCont() {
+              //  Functia asta va trimite datele catre server
+              //  Trebuie sa verificam daca datele sunt valide
 
-                //  Trimite datele catre server
-                fetch("/api/cashflow/" + "delete/contBancar", {
+              //  Trimite datele catre server
+              let response = fetch("/api/cashflow/" + "delete/contBancar", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                },
+                body: JSON.stringify({
+                  banca: name,
+                }),
+              });
+
+              let jsonData = await response.json();
+
+              console.log(jsonData);
+
+              //  Daca totul e ok, atunci sterge din tabel
+              if (jsonData["status"] == "Error") {
+                alert("A aparut o eroare la stergerea contului!");
+                return;
+              }
+
+              data = data.filter((cont) => {
+                console.log(cont[0], name);
+                return cont[0] != name;
+              });
+
+              table.update(data);
+            }
+
+            async function updateContBancar(sold) {
+              let body = {
+                banca: name,
+                sold: sold
+              };
+
+              const response = await fetch(
+                '/api/cashflow/update/contBancar',
+                {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Origin": "*",
                   },
-                  body: JSON.stringify({
-                    banca: name,
-                  }),
-                })
-                  .then(async (response) => {
-                    let data = await response.json();
-                    return data;
-                  })
-                  .then((jsonData) => {
-                    console.log(jsonData);
+                  body: JSON.stringify(body)
+                }
+              );
 
-                    //  Daca totul e ok, atunci sterge din tabel
-                    if (jsonData["status"] == "Error") {
-                      alert("A aparut o eroare la stergerea contului!");
-                      return;
-                    }
+              let jsonData = await response.json();
 
-                    data = data.filter((cont) => {
-                      console.log(cont[0], name);
-                      return cont[0] != name;
-                    });
+              if(jsonData['status'] != "OK") {
+                alert("ERROR");
+              }
 
-                    table.update(data);
-                  });
-              }).htmlElement,
+              //  Set the value
+              newSoldInput.placeholder = sold;
+              newSoldInput.value = '';
+
+              //  Hide the button
+              buttonHTML.classList.add('invisible');
+
+            }
+            
+            //  Creeam un buton pentru a trimite noile date
+            let updateSoldButton = IconButton.create(
+              null,
+              "blue-500",
+              UPDATE_ICON,
+              async () => {
+                //  Send data
+                let _sold = newSoldInput.value;
+
+                await updateContBancar(_sold);
+              }
+            );
+            let buttonHTML = updateSoldButton.htmlElement;
+
+            //  Mai intai va fi hidden
+            buttonHTML.classList.toggle("invisible");
+
+            //  Creeam textField pentru suma, precum si un buton care va aparea onChange
+            let newSoldInput = TextInput.create(
+              null,
+              "_newSoldInput",
+              "Sold",
+              `${sold}`,
+              "number",
+              false,
+              null,
+              () => {
+                if (newSoldInput.value != "") {
+                  buttonHTML.classList.remove("invisible");
+                } else {
+                  buttonHTML.classList.add("invisible");
+                }
+              }
+            );
+
+            data.pop();
+            data.push([
+              name,
+              newSoldInput.htmlElement,
+              buttonHTML,
+              IconButton.create(null, "red-500", TRASH_ICON, deleteCont)
+                .htmlElement,
             ]);
 
             table.update(data);
@@ -504,6 +570,7 @@
         data.push([
           nameInput.htmlElement,
           soldInput.htmlElement,
+          "", //  Empty for the sake of consistency
           addButton.htmlElement,
         ]);
 
@@ -532,30 +599,22 @@
       );
 
       async function getRecents() {
-        let retData = fetch("/api/cashflow/" + "get/recents", {
+        const response = await fetch("/api/cashflow/" + "get/recents", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
           },
-        })
-          .then(async (response) => {
-            let data = await response.json();
-            return data;
-          })
-          .then((data) => {
-            console.log(data);
+        });
 
-            data = data.map((item) => {
-              return [
-                item["firma"],
-                item["suma"] + " RON",
-                OperationRibbon(item["tip"]),
-              ];
-            });
-
-            return data;
-          });
+        let dataJSON = await response.json();
+        let retData = dataJSON.map((item) => {
+          return [
+            item["firma"],
+            item["suma"] + " RON",
+            OperationRibbon(item["tip"]),
+          ];
+        });
 
         return retData;
       }
@@ -619,68 +678,130 @@
       }
 
       async function getConturiBancare() {
-        let retData = fetch("/api/cashflow/" + "get/conturi", {
+        const response = await fetch("/api/cashflow/" + "get/conturi", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
           },
-        })
-          .then(async (response) => {
-            let data = await response.json();
-            return data;
-          })
-          .then((data) => {
-            console.log(data);
+        });
 
-            data = data.map((item) => {
+        let jsonData = await response.json();
 
-              return [
-                item["banca"],
-                item["sold"],
-                IconButton.create(null, "red-500", TRASH_ICON, async () => {
-                  //  Functia asta va trimite datele catre server
-                  //  Trebuie sa verificam daca datele sunt valide
+        let retData = jsonData.map((item) => {
+          //  Trimite datele catre server
+          async function deleteCont() {
+            //  Functia asta va trimite datele catre server
+            //  Trebuie sa verificam daca datele sunt valide
 
-                  //  Trimite datele catre server
-                  let response = await fetch(
-                    "/api/cashflow/" + "delete/contBancar",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*",
-                      },
-                      body: JSON.stringify({
-                        banca: item["banca"],
-                      }),
-                    }
-                  )
-                    .then(async (response) => {
-                      let data = await response.json();
-                      return data;
-                    })
-                    .then((jsonData) => {
-                      console.log(jsonData);
+            let name = item["banca"];
 
-                      //  Daca totul e ok, atunci sterge din tabel
-                      if (jsonData["status"] == "Error") {
-                        alert("A aparut o eroare la stergerea contului!");
-                        return;
-                      }
-                      console.log(typeof data, data);
-                      data = data.filter((cont) => {
-                        return cont[0] != item["banca"];
-                      });
-
-                      contBancarTable.update(data);
-                    });
-                }).htmlElement,
-              ];
+            //  Trimite datele catre server
+            const response = await fetch("/api/cashflow/" + "delete/contBancar", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+              },
+              body: JSON.stringify({
+                banca: name,
+              }),
             });
 
-            return data;
-          });
+            let jsonData = await response.json();
+
+            console.log(jsonData);
+
+            //  Daca totul e ok, atunci sterge din tabel
+            if (jsonData["status"] == "Error") {
+              alert("A aparut o eroare la stergerea contului!");
+              return;
+            }
+            let data = contBancarTable.entries;
+
+            data = data.filter((cont) => {
+              console.log(cont[0], name);
+              return cont[0] != name;
+            });
+
+            contBancarTable.update(data);
+          }
+
+          async function updateContBancar(sold) {
+            let body = {
+              banca: item['banca'],
+              sold: sold
+            };
+
+            const response = await fetch(
+              '/api/cashflow/update/contBancar',
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Access-Control-Allow-Origin": "*",
+                },
+                body: JSON.stringify(body)
+              }
+            );
+
+            let jsonData = await response.json();
+
+            if(jsonData['status'] != "OK") {
+              alert("ERROR");
+            }
+
+            //  Set the value of newSoldInput
+            newSoldInput.placeholder = sold;
+            newSoldInput.value = '';
+
+            //  Hide the button
+            buttonHTML.classList.add('invisible');
+
+          }
+
+          //  Creeam un buton pentru a trimite noile date
+          let updateSoldButton = IconButton.create(
+            null,
+            "blue-500",
+            UPDATE_ICON,
+            async () => {
+              //  SEND DATA
+              let sold = newSoldInput.value;
+              await updateContBancar(sold);
+            }
+          );
+          let buttonHTML = updateSoldButton.htmlElement;
+
+          //  Mai intai va fi hidden
+          buttonHTML.classList.toggle("invisible");
+
+          //  Creeam textField pentru suma, precum si un buton care va aparea onChange
+          let newSoldInput = TextInput.create(
+            null,
+            "_newSoldInput",
+            "Sold",
+            `${item["sold"]}`,
+            "number",
+            false,
+            null,
+            () => {
+              if (newSoldInput.value != "") {
+                buttonHTML.classList.remove("invisible");
+              } else {
+                buttonHTML.classList.add("invisible");
+              }
+            }
+          );
+
+          return [
+            item["banca"],
+            newSoldInput.htmlElement,
+            buttonHTML,
+            IconButton.create(null, "red-500", TRASH_ICON, deleteCont)
+              .htmlElement,
+          ];
+        });
 
         return retData;
       }

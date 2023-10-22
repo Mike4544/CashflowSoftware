@@ -717,11 +717,41 @@ async def update_date_lunare(
         print(e)
         return []
 
+async def update_cont_bancar(
+        banca: str,
+        sold: float,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    try:
+        if db_connection:
+            query = Query.update('ConturiBancare')\
+                .set('Sold', sold)\
+                .where(
+                    Field('Banca') == banca
+                )
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.update('ConturiBancare')\
+                .set('Sold', sold)\
+                .where(
+                    Field('Banca') == banca
+                )
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
 
 #   Delete operations
 async def delete_intrare(
         data: str | tuple[int, int, int],
-        companie: str
+        companie: str,
+        suma: float
 ) -> list[list[tuple]]:
     """
     Delete an entry from the Intrari table
@@ -739,16 +769,27 @@ async def delete_intrare(
         with Database(DB_PATH) as db:
 
             table = Table('Intrari')
+            select_query = Query.from_(table).select('ID').where(
+                (table.Zi == data[0]) & (table.Luna == data[1]) & (table.An == data[2]) & (table.Valoare == suma) & (table.Companie == companie)
+            ).limit(1)
+
+            id = (await db.query_async(select_query.get_sql()))[0]
+
             query = Query.from_(table).where(
-                table.Zi == data[0] & table.Luna == data[1] & table.An == data[2] & table.Companie == companie
-            )
+                table.ID == id
+            ).delete()
 
             return await db.query_async(query.get_sql())
 
-    except:
+    except Exception as e:
+        print(e)
         return []
 
-async def delete_iesire(data: str | tuple[int, int, int], companie: str) -> list[list[tuple]]:
+async def delete_iesire(
+        data: str | tuple[int, int, int],
+        companie: str,
+        suma: float
+) -> list[list[tuple]]:
     """
     Delete an entry from the Iesiri table
     :param data: Data dorita pentru delete (daca e ALL, se vor sterge toate intrarile)
@@ -765,7 +806,7 @@ async def delete_iesire(data: str | tuple[int, int, int], companie: str) -> list
 
             table = Table('Iesiri')
             query = Query.from_(table).where(
-                (table.Zi == data[0]) & (table.Luna == data[1]) & (table.An == data[2]) & (table.Companie == companie)
+                (table.Zi == data[0]) & (table.Luna == data[1]) & (table.An == data[2]) & (table.Valoare == suma) & (table.Companie == companie)
             ).delete()
 
             return await db.query_async(query.get_sql())

@@ -3,10 +3,13 @@
   <head>
     <!--  META  -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="height=device-height, 
+    <meta
+      name="viewport"
+      content="height=device-height, 
                       width=device-width, initial-scale=1.0, 
                       minimum-scale=1.0, maximum-scale=1.0, 
-                      user-scalable=no, target-densitydpi=device-dpi">
+                      user-scalable=no, target-densitydpi=device-dpi"
+    />
     <!--  SCRIPTS -->
     <script src="{{ url_for('static', filename='js/components/stats-container.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/operation-riboon.js') }}"></script>
@@ -269,7 +272,10 @@
         </div>
       </aside>
 
-      <div id="app-content" class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56">
+      <div
+        id="app-content"
+        class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56"
+      >
         <div class="top-content h-12 mb-10">
           <div class="header-row flex mb-2">
             <div class="page-icon mr-4">
@@ -296,10 +302,8 @@
               </svg>
             </div>
             <h1 class="page-header text-lg font-medium">
-              Tranzactii | 
-              <span id="titluLuna">
-                Data: {{ luna }} - {{ an }}
-              </span>
+              Tranzactii |
+              <span id="titluLuna"> Data: {{ luna }} - {{ an }} </span>
             </h1>
           </div>
           <hr />
@@ -330,15 +334,11 @@
         <!--  SUMA INITIALA -->
         <div class="mb-5">
           <h3 class="text-lg font-medium mb-5">
-            Suma initiala: 
+            Suma initiala:
             <span>
-              <div id="sumaInitiala" class="w-44 inline-block">
+              <div id="sumaInitiala" class="w-44 inline-block"></div>
 
-              </div>
-
-              <div id="sumaInitiala__edit" class="hidden inline-block">
-
-              </div>
+              <div id="sumaInitiala__edit" class="invisible inline-block"></div>
             </span>
           </h3>
         </div>
@@ -474,25 +474,27 @@
 
       async function setDataLunara() {
         let data = {
-          luna: lunaInput.value === "" ?  new Date().getMonth() + 1 : lunaInput.value,
+          luna:
+            lunaInput.value === ""
+              ? new Date().getMonth() + 1
+              : lunaInput.value,
           an: anInput.value === "" ? new Date().getFullYear() : anInput.value,
-          suma_noua: sumaInitialaField.value === "" ? -999 : sumaInitialaField.value,
+          suma_noua:
+            sumaInitialaField.value === "" ? -999 : sumaInitialaField.value,
         };
 
-        fetch(
-          '/api/cashflow/add/date_lunare',
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify(data),
-          }
-        ).then(async (data) => {
-          let jsonData = await data.json();
-          return jsonData;
+        fetch("/api/cashflow/add/date_lunare", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify(data),
         })
+          .then(async (data) => {
+            let jsonData = await data.json();
+            return jsonData;
+          })
           .then((jsonData) => {
             console.log("Suma initiala status: ", jsonData);
 
@@ -500,7 +502,6 @@
             sumaInitialaField.placeholder = `${sumaInitialaField.value} RON`;
             //  Clear the field
             sumaInitialaField.value = "";
-
           });
       }
 
@@ -509,7 +510,7 @@
         "Editeaza",
         null,
         setDataLunara
-      )
+      );
 
       let sumaInitialaField = TextInput.create(
         "#sumaInitiala",
@@ -523,15 +524,13 @@
           console.log(sumaInitialaField.value);
           const element = document.querySelector("#sumaInitiala__edit");
 
-          if(sumaInitialaField.value !== "") {
-            element.classList.remove("hidden");
+          if (sumaInitialaField.value !== "") {
+            element.classList.remove("invisible");
           } else {
-            element.classList.add("hidden");
+            element.classList.add("invisible");
           }
         }
       );
-
-
 
       let tabelIntrari = OperationsTable.create(
         "#tabelIntrari",
@@ -599,99 +598,138 @@
               9: 30,
               10: 31,
               11: 30,
-              12: 31
+              12: 31,
             };
 
-            let currentMonth = lunaInput.value === "" ? new Date().getMonth() + 1 : lunaInput.value;
-            let currentYear = anInput.value === "" ? new Date().getFullYear() : anInput.value;
+            let currentMonth =
+              lunaInput.value === ""
+                ? new Date().getMonth() + 1
+                : lunaInput.value;
+            let currentYear =
+              anInput.value === "" ? new Date().getFullYear() : anInput.value;
 
             let addEntry = (key) => {
               //  Create a static table for the dropdown
-              let staticTable = new StaticTable(
-                ["Firma", "Valori"],
-                [],
-                false
-              );
+              let staticTable = new StaticTable(["Firma", "Valori"], [], false);
 
-              staticTable.update([
+              staticTable.update(...[
                 //  Map the sums from all the companies
                 ...Object.keys(jsonData[key]["firma"]).map((firma) => {
-                    //  console.log([firma, jsonData[key]["firma"][firma]]);
-                    return [
-                      firma,
-                      jsonData[key]["firma"][firma],
-                      //  Add a delete button
-                      IconButton.create(null, "red-400", TRASH_ICON, (e) => {
-                        //  console.log(e);
-                        //  Update the table with the current firma removed
+                  //  console.log([firma, jsonData[key]["firma"][firma]]);
+                  console.log(typeof jsonData[key]['firma'][firma], jsonData[key]["firma"][firma]);
+
+                  let firmaEntries = jsonData[key]["firma"][firma];
+                  let dateFirma = [];
+
+                  for(let i = 0; i < firmaEntries.length; i++) {
+                    let entry = firmaEntries[i];
+                    console.log("entry", entry);
+
+                    dateFirma.push(...[
+                      [
+                        firma,
+                        entry,
+                        //  Add a delete button
+                        IconButton.create(null, "red-400", TRASH_ICON, (e) => {
+                          //  console.log(e);
+                          //  Update the table with the current firma removed
                           function _removeUIrow() {
-                            let newData = staticTable.entries.filter((entry) => {
-                            return entry[0] !== firma;
-                          });
 
-                          async function _serverCallback() {
+                            let newData = staticTable.entries;
+                            
+                            newData = [...newData]
 
-                            let data = {
-                              zi: jsonData[key]["zi"],
-                              luna: jsonData[key]["luna"],
-                              an: jsonData[key]["an"],
-                              companie: firma,
-                            };
-
-                            fetch(
-                              "/api/cashflow/" + "delete/" + (type === "intrari" ? "intrare" : "iesire"),
-                              {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  // 'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: JSON.stringify(data),
+                            let temp = Array();
+                            for(let _entry of newData) {
+                              if(_entry[0] === firma && _entry[1] === entry) {
+                                temp.push(_entry);
                               }
-                            )
-                              .then(async (data) => {
-                                let jsonData = await data.json();
-                                return jsonData;
-                              })
-                              .then((jsonData) => {
-                                console.log(jsonData);
-                              });
+                            }
 
+                            newData = temp;
+                            
+                            
+                            for(let i = 0; i < newData.length; i++) {
+                              if(newData[i][0] === firma && newData[i][1] === entry) {
+                                newData.splice(i, 1);
+                                break;
+                              }
+                            }
 
+                            async function _serverCallback() {
+                              let data = {
+                                zi: jsonData[key]["zi"],
+                                luna: jsonData[key]["luna"],
+                                an: jsonData[key]["an"],
+                                companie: firma,
+                                suma: entry,
+                              };
+
+                              fetch(
+                                "/api/cashflow/" +
+                                  "delete/" +
+                                  (type === "intrari" ? "intrare" : "iesire"),
+                                {
+                                  method: "POST",
+                                  headers: {
+                                    "Content-Type": "application/json",
+                                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                                  },
+                                  body: JSON.stringify(data),
+                                }
+                              )
+                                .then(async (data) => {
+                                  let jsonData = await data.json();
+                                  return jsonData;
+                                })
+                                .then((jsonData) => {
+                                  console.log(jsonData);
+                                });
+                            }
+
+                            staticTable.update(newData);
+
+                            _serverCallback();
                           }
 
-                          staticTable.update(newData);
+                          _removeUIrow();
+                        }).htmlElement,
+                      ]
+                      ]);
+                  }
 
-                          _serverCallback();
-                        }
 
-                        _removeUIrow();
-                      }).htmlElement,
-                    ];
-                  }),
-                ]);
+                  console.log("Date firma", dateFirma);
+                  return [...dateFirma];
+                }),
+              ]);
 
-              let dropdown = new Dropdown("Detalii", [
-                staticTable.tableElement,
-              ], false);
+              let dropdown = new Dropdown(
+                "Detalii",
+                [staticTable.tableElement],
+                false
+              );
 
               updatedData.push([
                 `${jsonData[key]["zi"]}-${jsonData[key]["luna"]}-${jsonData[key]["an"]}`,
                 dropdown.htmlElement,
                 jsonData[key]["suma"],
               ]);
-            }
+            };
 
-
-            for(let i = 1; i <= monthLUT[currentMonth]; i++) {
+            for (let i = 1; i <= monthLUT[currentMonth]; i++) {
               //  Test if jsonData truly has no data
-              if(Object.keys(jsonData).length === 0) {
+              if (Object.keys(jsonData).length === 0) {
                 updatedData.push(["No data found"]);
                 break;
               }
 
-              if(jsonData[i] === undefined) {
-                updatedData.push([`${i}-${currentMonth}-${currentYear}`, '-', '-']);
+              if (jsonData[i] === undefined) {
+                updatedData.push([
+                  `${i}-${currentMonth}-${currentYear}`,
+                  "-",
+                  "-",
+                ]);
                 continue;
               }
               addEntry(i);
@@ -703,23 +741,21 @@
         return data;
       }
       async function getInitSuma() {
-        let data = fetch(
-          '/api/cashflow/get/date_lunare',
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              // 'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: JSON.stringify({
-              luna: lunaInput.value === "" ? null : lunaInput.value,
-              an: anInput.value === "" ? null : anInput.value,
-            }),
-          }
-        ).then(async (data) => {
-          let jsonData = await data.json();
-          return jsonData;
+        let data = fetch("/api/cashflow/get/date_lunare", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: JSON.stringify({
+            luna: lunaInput.value === "" ? null : lunaInput.value,
+            an: anInput.value === "" ? null : anInput.value,
+          }),
         })
+          .then(async (data) => {
+            let jsonData = await data.json();
+            return jsonData;
+          })
           .then((jsonData) => {
             let sumaInitiala = jsonData["suma_initiala"];
             return sumaInitiala;
@@ -727,7 +763,7 @@
 
         return data;
       }
-      
+
       async function getQueriesData(
         dataJSON = {
           luna: null,
@@ -738,15 +774,13 @@
         Promise.all([
           getTableData("intrari", dataJSON),
           getTableData("iesiri", dataJSON),
-          getInitSuma()
+          getInitSuma(),
         ]).then((data) => {
-
           tabelIntrari.update(data[0]);
           tabelIesiri.update(data[1]);
 
           let sumaInitiala = data[2][0];
           sumaInitialaField.placeholder = `${sumaInitiala} RON`;
-
 
           console.log(data);
 
@@ -769,13 +803,9 @@
             let totalDays = [];
             let updatedData = [];
 
-            for (
-              let day = 0;
-              day < data[0].length;
-              day++
-            ) {
-              let _intrare = data[0][day][2] === '-' ? 0 : data[0][day][2];
-              let _iesire = data[1][day][2] === '-' ? 0 : data[1][day][2];
+            for (let day = 0; day < data[0].length; day++) {
+              let _intrare = data[0][day][2] === "-" ? 0 : data[0][day][2];
+              let _iesire = data[1][day][2] === "-" ? 0 : data[1][day][2];
 
               let dayTotal = _intrare - _iesire;
 

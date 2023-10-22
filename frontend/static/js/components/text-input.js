@@ -19,7 +19,7 @@ class TextInput {
                 id="${formID}"
                 placeholder="${placeholder}"
                 ${required ? 'required' : ''}
-                class="w-full rounded-md border-gray-200 pe-10 shadow-sm sm:text-sm"
+                class="w-full min-w-[100px] rounded-md border-gray-200 shadow-sm sm:text-sm"
               />
 
               <span
