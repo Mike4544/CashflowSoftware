@@ -8,6 +8,7 @@ The database contains three tables:
     - Iesiri
     - DateLunare
     - ConturiBancare
+    - Salariati
     - Config
     
 The Intrari table contains the following columns:
@@ -115,6 +116,33 @@ async def create_cashflow_table() -> bool:
                 """
             )
 
+            #   Tabela angajati
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS Salariati (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Nume VARCHAR(255),
+                    Companie VARCHAR(255)
+                    
+                );
+                """
+            )
+            #   Tabela config cont bancar
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS Salarii (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Luna INTEGER DEFAULT 1,
+                    An INTEGER DEFAULT 1970,
+                    Angajat VARCHAR(255),
+                    Companie VARCHAR(255),
+                    Salariu INTEGER DEFAULT 0,
+                    Bonus INTEGER DEFAULT 0
+                );
+                """
+            )
+
+
     except Exception as e:
         print(e)
         return False
@@ -208,15 +236,16 @@ async def insert_intrare_many(
 
                 entries_added.append(res)
 
-        with Database(DB_PATH) as db:
-            for entry in entries:
+        else :
+            with Database(DB_PATH) as db:
+                for entry in entries:
 
-                if isinstance(entry[0], str):
-                    entry[0] = [int(x) for x in entry[0].split('-')]
+                    if isinstance(entry[0], str):
+                        entry[0] = [int(x) for x in entry[0].split('-')]
 
-                res = await insert_intrare(*entry, db_connection=db)
+                    res = await insert_intrare(*entry, db_connection=db)
 
-                entries_added.append(res)
+                    entries_added.append(res)
 
         return entries_added
     except Exception as e:
@@ -397,6 +426,120 @@ async def insert_cont_bancar(
     except Exception as e:
         print(e)
         return []
+
+async def insert_angajat(
+        nume: str,
+        companii: list[str],
+        db_connection: Database = None
+):
+    
+    table = Table("Salariati")
+    
+    query = Query.into(table)
+    for company in companii:
+        query.insert(
+            nume, company
+        )
+
+    try:
+        if db_connection:
+            return await db_connection.query_async(query.get_sql())
+        
+        with Database(DB_PATH) as db:
+            return await db.query_async(query.get_sql())
+    
+    except Exception as e:
+        print(e)
+        return []
+    
+async def insert_angajat_many(
+        angajati: list[
+            tuple[
+                str, list[str]
+                ]
+            ],
+        db_connection: Database = None
+) -> bool:
+    
+    try:
+        if db_connection:
+            for angajat in angajati:
+                await insert_angajat(
+                    *angajat,
+                    db_connection=db_connection
+                )
+            return True
+
+        else:
+            with Database(name=DB_PATH) as db:
+                for angajat in angajati:
+                    await insert_angajat(
+                        *angajat,
+                        db_connection=db
+                    )
+            return True
+        
+    except Exception as e:
+        print(e)
+        return False
+    
+
+async def insert_salariu(
+        data: tuple,
+        nume: str,
+        companie: str,
+        valoare: float,
+        bonus: float,
+        db_connection: Database = None
+):
+    
+    table = Table("Salarii")
+    
+    query = Query.into(table).insert(
+        *data, nume, companie, valoare, bonus
+    )
+
+    try:
+        if db_connection:
+            return await db_connection.query_async(query.get_sql())
+        
+        with Database(DB_PATH) as db:
+            return await db.query_async(query.get_sql())
+    
+    except Exception as e:
+        print(e)
+        return []
+    
+async def insert_salariu_many(
+        salarii: list[
+            tuple[
+                tuple, str, str, float, float
+            ]
+        ],
+        db_connection: Database = None
+) -> bool:
+    
+    try:
+        if db_connection:
+            for salariu in salarii:
+                await insert_salariu(
+                    *salariu,
+                    db_connection=db_connection
+                )
+            return True
+
+        else:
+            with Database(name=DB_PATH) as db:
+                for salariu in salarii:
+                    await insert_salariu(
+                        *salariu,
+                        db_connection=db_connection
+                    )
+            return True
+        
+    except Exception as e:
+        print(e)
+        return False
 
 
 #   =================================================================
@@ -618,6 +761,57 @@ async def get_conturi_bancare(
     except Exception as e:
         print(e)
         return []
+    
+
+async def get_angajati(
+        db_connection: Database = None
+) -> list[tuple]:
+    
+    db = db_connection or Database(DB_PATH)
+
+    table_salariati = Table("Salariati")
+    query = Query.into(
+        table_salariati
+    ).select("*")
+
+    try:
+        return await db.query_async(query.get_sql())
+    except Exception as e:
+        print(e)
+        return []
+    
+    
+async def get_salarii(
+        angajati: list[str],
+        companii: list[str],
+        data: tuple(int, int) = (datetime.now().month, datetime.now().year),
+        db_connection: Database = None
+):
+    
+    db = db_connection or Database(DB_PATH)
+
+
+    table = Table("Salarii")
+    query = Query.from_(table).select('*').where(
+        table.Luna == data[0] & table.An == data[1]
+    )
+
+    if len(angajati) > 0:
+        query = query.where(
+            table.Nume.isin(angajati)
+        )
+
+    if len(companii) > 0:
+        query = query.where(
+            table.Companie.isin(companii)
+        )
+
+    try:
+        return await db.query_async(query.get_sql())
+    except Exception as e:
+        print(e)
+        return []
+
 
 
 #   =================================================================

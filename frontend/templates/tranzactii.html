@@ -719,10 +719,10 @@
 
             for (let i = 1; i <= monthLUT[currentMonth]; i++) {
               //  Test if jsonData truly has no data
-              if (Object.keys(jsonData).length === 0) {
-                updatedData.push(["No data found"]);
-                break;
-              }
+              // if (Object.keys(jsonData).length === 0) {
+              //   updatedData.push(["No data found"]);
+              //   break;
+              // }
 
               if (jsonData[i] === undefined) {
                 updatedData.push([
@@ -779,7 +779,7 @@
           tabelIntrari.update(data[0]);
           tabelIesiri.update(data[1]);
 
-          let sumaInitiala = data[2][0];
+          let sumaInitiala = data[2][0] === undefined ? 0 : data[2][0];
           sumaInitialaField.placeholder = `${sumaInitiala} RON`;
 
           console.log(data);
@@ -818,7 +818,7 @@
             }, 0);
 
             //  Add the initial sum to the total
-            total += sumaInitiala;
+            total += parseFloat(sumaInitiala);
 
             total = `<b>${total} RON</b>`;
 
