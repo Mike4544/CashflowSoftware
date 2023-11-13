@@ -71,7 +71,7 @@
             <div class="border-t">
               <a
                 href="/upload"
-                class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white focus:outline-none focus:ring active:text-blue-500"
                 id="uploadDocument"
               >
                 <span class="text-sm font-medium"> Incarca document </span>
@@ -385,7 +385,7 @@
     <script async>
       let recentsTable = OperationsTable.create(
         "#recentTable",
-        ["Firma", "Suma", "Tip Operatiune"],
+        ["Data", "Firma", "Suma", "Tip Operatiune"],
         [[SpinnerElement]]
       );
 
@@ -610,6 +610,7 @@
         let dataJSON = await response.json();
         let retData = dataJSON.map((item) => {
           return [
+            `${item['zi']}-${item['luna']}-${item['an']}`, 
             item["firma"],
             item["suma"] + " RON",
             OperationRibbon(item["tip"]),
@@ -644,6 +645,7 @@
             Object.keys(data).forEach((key) => {
               sum += data[key]["suma"];
             });
+            console.log("Intreari SUM: ", sum);
             return sum;
           });
 
@@ -810,15 +812,15 @@
       async function getData() {
         Promise.all([getMonthData(), getRecents(), getConturiBancare()]).then(
           (data) => {
-            console.log(data);
+            console.log("DATE: " + data[0][0]);
 
             let balanta = data[0][0] - data[0][1];
             let recents = data[1];
             let conturi = data[2];
 
-            statsBalanta.update(balanta + " RON");
-            statsIntrari.update(data[0][0] + " RON");
-            statsIesiri.update(data[0][1] + " RON");
+            statsBalanta.update(parseFloat(balanta).toFixed(2) + " RON");
+            statsIntrari.update(parseFloat(data[0][0]).toFixed(2)  + " RON");
+            statsIesiri.update(parseFloat(data[0][1]).toFixed(2) + " RON");
 
             recentsTable.update(recents);
             contBancarTable.update(conturi);

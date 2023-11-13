@@ -49,10 +49,14 @@ The Config table contains the following columns:
 :author:    Mihai Tira
 """
 
-from pypika import Query, Table, Field, Order, Case
+from pypika import Query, Table, Field, Order, Case, SQLLiteQuery
 from datetime import datetime
 
 DB_PATH = 'backend/database/cashflow.db'
+
+
+def create_db_connection():
+    return Database(DB_PATH)
 
 #   Create the tables if they don't exist
 async def create_cashflow_table() -> bool:
@@ -134,7 +138,7 @@ async def create_cashflow_table() -> bool:
                     ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     Luna INTEGER DEFAULT 1,
                     An INTEGER DEFAULT 1970,
-                    Angajat VARCHAR(255),
+                    IdAngajat INTEGER,
                     Companie VARCHAR(255),
                     Salariu INTEGER DEFAULT 0,
                     Bonus INTEGER DEFAULT 0
@@ -435,18 +439,32 @@ async def insert_angajat(
     
     table = Table("Salariati")
     
-    query = Query.into(table)
-    for company in companii:
-        query.insert(
-            nume, company
+    query = Query.into(table).columns("Nume", "Companie")
+    for companie in companii:
+        query = query.insert(
+            nume, companie
         )
+
+        # For every employee, insert a salary for every company
+        table_salarii = Table("Salarii")
+        query_salarii = Query.into(table_salarii).columns(
+            "Luna", "An", "IdAngajat", "Companie"
+        )
+
+        if db_connection:
+            await db_connection.query_async(query_salarii.get_sql())
+        else:
+            with Database(DB_PATH) as db:
+                await db.query_async(query_salarii.get_sql())
+
+    #   print("QUERY: ", query.get_sql())
 
     try:
         if db_connection:
-            return await db_connection.query_async(query.get_sql())
+            return await db_connection.query_async(query.get_sql()), db_connection.lastrowid()
         
         with Database(DB_PATH) as db:
-            return await db.query_async(query.get_sql())
+            return await db.query_async(query.get_sql()), db.lastrowid()
     
     except Exception as e:
         print(e)
@@ -464,6 +482,7 @@ async def insert_angajat_many(
     try:
         if db_connection:
             for angajat in angajati:
+                print(angajat)
                 await insert_angajat(
                     *angajat,
                     db_connection=db_connection
@@ -473,6 +492,7 @@ async def insert_angajat_many(
         else:
             with Database(name=DB_PATH) as db:
                 for angajat in angajati:
+                    #print(*angajat)
                     await insert_angajat(
                         *angajat,
                         db_connection=db
@@ -485,8 +505,9 @@ async def insert_angajat_many(
     
 
 async def insert_salariu(
-        data: tuple,
-        nume: str,
+        luna: int,
+        an: int,
+        id_angajat: int,
         companie: str,
         valoare: float,
         bonus: float,
@@ -495,8 +516,10 @@ async def insert_salariu(
     
     table = Table("Salarii")
     
-    query = Query.into(table).insert(
-        *data, nume, companie, valoare, bonus
+    query = Query.into(table).columns(
+        "Luna", "An", "IdAngajat", "Companie", "Salariu", "Bonus"
+    ).insert(
+        luna, an, id_angajat, companie, valoare, bonus
     )
 
     try:
@@ -513,7 +536,7 @@ async def insert_salariu(
 async def insert_salariu_many(
         salarii: list[
             tuple[
-                tuple, str, str, float, float
+                tuple, int, str, float, float
             ]
         ],
         db_connection: Database = None
@@ -649,11 +672,37 @@ async def get_iesiri(
 
 
         if db_connection:
-            return await db_connection.query_async(query.get_sql())
+            entries = await db_connection.query_async(query.get_sql())
 
 
         with Database(DB_PATH) as db:
-            return await db.query_async(query.get_sql())
+            entries = await db.query_async(query.get_sql())
+
+        # Get the sum of the salaries
+        salarii = await get_salarii(
+            an=an or datetime.now().year,
+            luna=luna or datetime.now().month,
+        )
+
+        # Get the sum of the salaries
+        sum = 0;
+        for salariu in salarii:
+            sum += salariu[5] + salariu[6]
+
+        # In a 10-a a lunii, add 1/3 of the salaries to the total
+        third = sum / 3
+        entries.append(
+            (-99, 'Iesire', 10, luna or datetime.now().month, an or datetime.now().year, 'Salarii', third, 0,
+             sum / 3)
+        )
+
+        # In a 25-a a lunii, add 2/3 of the salaries to the total
+        entries.append(
+            (-99, 'Iesire', 25, luna or datetime.now().month, an or datetime.now().year, 'Salarii', 2 * third, 0,
+             sum * 2 / 3)
+        )
+
+        return entries
 
     except Exception as e:
         print(e)
@@ -674,7 +723,11 @@ async def get_recent_operations(
     iesiri = Table('Iesiri')
 
     # Make an union of the two tables
-    query = Query.from_(intrari).select('*') + Query.from_(iesiri).select('*')
+    query = Query.from_(intrari).select('*').where(
+        (intrari.Luna == datetime.now().month) & (intrari.An == datetime.now().year)
+    ) + Query.from_(iesiri).select('*').where(
+        (iesiri.Luna == datetime.now().month) & (iesiri.An == datetime.now().year)
+    )
     query = query.orderby('Zi', order=Order.desc).orderby('Luna', order=Order.desc).orderby('An', order=Order.desc)
     query = query.limit(limit)
 
@@ -763,6 +816,27 @@ async def get_conturi_bancare(
         return []
     
 
+async def get_angajat(
+        id,
+        db_connection: Database = None
+) -> list[tuple]:
+
+        try:
+            table = Table('Salariati')
+            query = Query.from_(table).select('*').where(
+                table.ID == id
+            )
+
+            if db_connection:
+                return await db_connection.query_async(query.get_sql())
+
+            with Database(DB_PATH) as db:
+                return await db.query_async(query.get_sql())
+
+        except Exception as e:
+            print(e)
+            return []
+
 async def get_angajati(
         db_connection: Database = None
 ) -> list[tuple]:
@@ -770,7 +844,7 @@ async def get_angajati(
     db = db_connection or Database(DB_PATH)
 
     table_salariati = Table("Salariati")
-    query = Query.into(
+    query = Query.from_(
         table_salariati
     ).select("*")
 
@@ -782,9 +856,10 @@ async def get_angajati(
     
     
 async def get_salarii(
-        angajati: list[str],
-        companii: list[str],
-        data: tuple(int, int) = (datetime.now().month, datetime.now().year),
+        an: int = None,
+        luna = None,
+        angajati: list[int] = None,
+        companii: list[str] = None,
         db_connection: Database = None
 ):
     
@@ -793,15 +868,21 @@ async def get_salarii(
 
     table = Table("Salarii")
     query = Query.from_(table).select('*').where(
-        table.Luna == data[0] & table.An == data[1]
+        table.An == (an or datetime.now().year)
     )
 
-    if len(angajati) > 0:
+    if luna:
         query = query.where(
-            table.Nume.isin(angajati)
+            table.Luna == luna
         )
 
-    if len(companii) > 0:
+
+    if angajati:
+        query = query.where(
+            table.IdAngajat.isin(angajati)
+        )
+
+    if companii:
         query = query.where(
             table.Companie.isin(companii)
         )
@@ -941,6 +1022,74 @@ async def update_cont_bancar(
         return []
 
 
+async def update_angajat(
+        id: int,
+        nume: str,
+        companie: str,
+        db_connection: Database = None
+) -> list[tuple]:
+
+        try:
+            if db_connection:
+                query = Query.update('Salariati')\
+                    .set('Nume', nume)\
+                    .set('Companie', companie)\
+                    .where(
+                        Field('ID') == id
+                    )
+
+                return await db_connection.query_async(query.get_sql())
+
+            with Database(DB_PATH) as db:
+                query = Query.update('Salariati')\
+                    .set('Nume', nume)\
+                    .set('Companie', companie)\
+                    .where(
+                        Field('ID') == id
+                    )
+
+                return await db.query_async(query.get_sql())
+
+        except Exception as e:
+            print(e)
+            return []
+
+async def update_salariu(
+        luna: int,
+        an: int,
+        id_angajat: int,
+        companie: str,
+        valoare: float,
+        bonus: float,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    try:
+        if db_connection:
+            query = Query.update('Salarii')\
+                .set('Salariu', valoare)\
+                .set('Bonus', bonus)\
+                .where(
+                    (Field('Luna') == luna) & (Field('An') == an) & (Field('IdAngajat') == id_angajat) & (Field('Companie') == companie)
+                )
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.update('Salarii')\
+                .set('Salariu', valoare)\
+                .set('Bonus', bonus)\
+                .where(
+                    (Field('Luna') == luna) & (Field('An') == an) & (Field('IdAngajat') == id_angajat) & (Field('Companie') == companie)
+                )
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+
 #   Delete operations
 async def delete_intrare(
         data: str | tuple[int, int, int],
@@ -1017,6 +1166,56 @@ async def delete_cont_bancar(banca: str) -> list[list[tuple]]:
             table = Table('ConturiBancare')
             query = Query.from_(table).where(
                 table.Banca == banca
+            ).delete()
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+
+async def delete_angajat(id: int) -> list[list[tuple]]:
+
+        try:
+            with Database(DB_PATH) as db:
+
+                table = Table('Salariati')
+                query = Query.from_(table).where(
+                    table.ID == id
+                ).delete()
+
+                # Delete all salaries for the employee
+                table_salarii = Table("Salarii")
+                query_salarii = Query.from_(table_salarii).where(
+                    table_salarii.IdAngajat == id
+                ).delete()
+
+                return await db.query_async(query.get_sql()) and await db.query_async(query_salarii.get_sql())
+
+        except Exception as e:
+            print(e)
+            return []
+
+async def delete_salariu(
+        luna: int,
+        an: int,
+        id_angajat: int,
+        companie: str,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    try:
+        if db_connection:
+            query = Query.from_('Salarii').where(
+                (Field('Luna') == luna) & (Field('An') == an) & (Field('IdAngajat') == id_angajat) & (Field('Companie') == companie)
+            ).delete()
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.from_('Salarii').where(
+                (Field('Luna') == luna) & (Field('An') == an) & (Field('IdAngajat') == id_angajat) & (Field('Companie') == companie)
             ).delete()
 
             return await db.query_async(query.get_sql())

@@ -211,24 +211,28 @@ class StaticTable {
         //  To update the body
         this.entries = data;
 
+        console.log("DATA:", data);
+
         // Create the body
         let tbody = document.createElement('tbody');
         tbody.classList = "divide-y divide-gray-200";
 
         //  Create the body rows
-        for(let entry in this.entries) {
+        for(let entry in data) {
+            console.log("ENTRY:", data[entry]);
             let tr = document.createElement('tr');
             tr.className = 'h-14';
             //  Create the body cells
-            for(let cell in this.entries[entry]) {
+            for(let cell in data[entry]) {
+                console.log("CELL:", data[entry][cell]);
                 let td = document.createElement('td');
                 td.classList = "whitespace-nowrap px-4 py-2 text-gray-700";
                 // Append the HTML element
                 try {
-                    td.appendChild(this.entries[entry][cell]);
+                    td.appendChild(data[entry][cell]);
                 }
                 catch {
-                    td.innerHTML = this.entries[entry][cell];
+                    td.innerHTML = data[entry][cell];
                 }
                 tr.appendChild(td);
             }

@@ -6,6 +6,7 @@ class Database:
         try:
             self.__con = sqlite3.connect(name, check_same_thread=False)
         except sqlite3.Error as e:
+            print(e)
             raise Exception(e)
 
         self.__cur = self.__con.cursor()
@@ -39,6 +40,9 @@ class Database:
     def fetchone(self):
         return self.__cur.fetchone()
 
+    def lastrowid(self):
+        return self.__cur.lastrowid
+
     def query(self, sql, params=None):
         self.execute(sql, params)
         return self.fetchall()
@@ -46,4 +50,6 @@ class Database:
     async def query_async(self, sql: str, params=None):
         print(sql)
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, self.query, sql, params)
+        return await loop.run_in_executor(
+            None, self.query, sql, params
+        )

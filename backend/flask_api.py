@@ -4,6 +4,8 @@ import asyncio
 from backend.api import cashflow_api as cAPI
 from backend.api import config_api as cfgAPI
 
+from backend.integrations import integrations as iAPI
+
 api_routes = Blueprint('api_routes', __name__)
 
 #   =================================================================
@@ -49,6 +51,8 @@ async def get_intrari():
             "luna": luna,
             "an": an
         }
+
+    print(data)
 
     return jsonify(data)
 
@@ -158,6 +162,114 @@ async def get_conturi():
     return jsonify(data)
 
 @api_routes.route('/api/cashflow/get/angajati')
+async def get_angajati():
+    raw_data = await cAPI.get_angajati()
+
+    data = [{
+        "ID": ID,
+        "nume": nume,
+        "firma": firma
+    } for ID, nume, firma in raw_data]
+
+    return jsonify(data)
+
+async def __get_angajati():
+    # This is a private method, used to get the list of angajati
+    # from the database
+    raw_data = await cAPI.get_angajati()
+
+    data = [{
+        "ID": ID,
+        "nume": nume,
+        "firma": firma
+    } for ID, nume, firma in raw_data]
+
+    return data
+
+
+@api_routes.route('/api/cashflow/get/angajat/<int:id>')
+async def get_angajat(id):
+    raw_data = await cAPI.get_angajat(id)
+
+    data = {
+        "ID": raw_data[0],
+        "nume": raw_data[1],
+        "firma": raw_data[2]
+    }
+
+    return jsonify(data)
+
+async def __get_angajat(id):
+    # This is a private method, used to get the list of angajati
+    # from the database
+    raw_data = (await cAPI.get_angajat(id))[0]
+
+    data = {
+        "ID": raw_data[0],
+        "nume": raw_data[1],
+        "firma": raw_data[2]
+    }
+
+    return data
+
+@api_routes.route('/api/cashflow/get/salariu')
+async def get_salariu():
+    json_data = await request.get_json()
+
+    raw_data = await cAPI.get_salarii(
+        an=json_data['an'],
+        angajati= [json_data['angajatID']]
+    )
+
+    data = [
+        {
+            "luna": luna,
+            "salariu": salariu,
+            "bonus": bonus
+        } for luna, salariu, bonus in raw_data
+    ]
+
+    return jsonify(data)
+
+async def __get_salariu(an, angajati):
+    raw_data = await cAPI.get_salarii(
+        an=an,
+        angajati=angajati
+    )
+
+    print(raw_data)
+
+    data = [
+        {
+            "luna": luna,
+            "salariu": salariu,
+            "bonus": bonus
+        } for _, luna, _, _, _, salariu, bonus in raw_data
+    ]
+
+    return data
+
+@api_routes.route('/api/cashflow/get/salariiSum', methods=['POST'])
+async def get_salarii_sum():
+    json_data = await request.get_json()
+
+    raw_data = await cAPI.get_salarii(
+        an=json_data['an'],
+        luna=json_data['luna']
+    )
+    print(raw_data)
+
+    sum = 0
+    for entry in raw_data:
+        sum += entry[5]
+        sum += entry[6]
+
+    data = {
+        "suma": sum
+    }
+
+    return jsonify(data)
+
 #   =================================================================
 #   =================================================================
 
@@ -227,6 +339,132 @@ async def add_cont():
             "status": "Error"
         })
 
+@api_routes.route('/api/cashflow/add/angajat', methods=['POST'])
+async def add_angajat():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        angajat = await cAPI.insert_angajat(
+            nume=json_data['nume'],
+            companii=[json_data['firma']]
+        )
+
+        print(angajat)
+
+        return jsonify({
+            "status": "OK",
+            "data": {
+                "ID": angajat[1],
+                "nume": json_data['nume'],
+                "firma": json_data['firma']
+            }
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/add/data', methods=['POST'])
+async def add_date():
+    json_data: list[dict] = await request.get_json()
+
+    # Will get a JSON list like this:
+    # [
+    #   {
+    #       "data": dd-mm-yyyy,
+    #       "firma": "Company 1",
+    #       "tip": "intrare",
+    #       "valoare": "100",
+    #   }
+    # ]
+
+    try:
+        db_conn = cAPI.create_db_connection()
+
+        for entry in json_data:
+            date = entry['data']
+            date = [int(x) for x in date.split('-')]
+
+            firma = entry['firma']
+            tip = entry['tip']
+            valoare = float(entry['valoare'])
+
+            if tip == 'intrare':
+                await cAPI.insert_intrare(
+                    data=date,
+                    companie=firma,
+                    val=valoare,
+                    tva=0,
+                    total=valoare,
+                    db_connection=db_conn
+                )
+            elif tip == 'iesire':
+                await cAPI.insert_iesire(
+                    data=date,
+                    companie=firma,
+                    val=valoare,
+                    tva=0,
+                    total=valoare,
+                    db_connection=db_conn
+                )
+
+        db_conn.close()
+
+        return jsonify({
+            "status": "OK"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/add/file', methods=['POST'])
+async def add_file():
+    files = await request.files
+    form = await request.form
+
+    try:
+       if 'file' not in files:
+           return jsonify({
+               "status": "Error",
+               "message": "No file found"
+           })
+
+       file = files['file']
+       integration = form['integration']
+
+       # Save the file to the server
+       # Make the directory if it doesn't exist
+       import os
+       if not os.path.exists(f"__temp/{integration}"):
+             os.makedirs(f"__temp/{integration}")
+
+       await file.save(f"__temp/{integration}/{file.filename}")
+
+       # Get the data from the file
+       m_data = iAPI.integration(
+           name=integration,
+           file=f"__temp/{integration}/{file.filename}"
+       )
+
+       # Add the list to a json response
+       body = {
+            "status": "OK",
+            "data": m_data
+       }
+
+       return jsonify(body)
+
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+
 #   =================================================================
 #   =================================================================
 
@@ -242,6 +480,64 @@ async def update_cont():
             banca=json_data['banca'],
             sold=json_data['sold']
         )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+
+@api_routes.route('/api/cashflow/update/salariat', methods=['POST'])
+async def update_angajat():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.update_angajat(
+            id=json_data['id'],
+            nume=json_data['nume'],
+            companie=json_data['firma']
+        )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/update/salariu', methods=['POST'])
+async def update_salariu():
+    json_data = await request.get_json()
+    print(json_data)
+
+    # Get the current salariu for the angajat
+    salarii = await __get_salariu(
+        an=json_data['an'],
+        angajati=[json_data['angajatID']]
+    )
+
+    if len(salarii) > 0:
+        method = cAPI.update_salariu
+    else:
+        method = cAPI.insert_salariu
+
+    try:
+        for salariu in json_data['salarii']:
+            await method(
+                luna=salariu['luna'],
+                an=json_data['an'],
+                id_angajat=json_data['angajatID'],
+                companie=json_data['companie'],
+                valoare=salariu['salariu'],
+                bonus=salariu['bonus']
+            )
 
         return jsonify({
             "status": "OK"
@@ -306,6 +602,26 @@ async def delete_cont():
     try:
         await cAPI.delete_cont_bancar(
             banca=json_data['banca']
+        )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+
+@api_routes.route('/api/cashflow/delete/salariat', methods=['POST'])
+async def delete_angajat():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.delete_angajat(
+            id=json_data['id']
         )
 
         return jsonify({

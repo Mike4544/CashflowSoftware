@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,11 +21,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}" />
-
-    <title>Salariati | Helion Finance§</title>
+    <title>{{ nume }} | Helion Finances</title>
 </head>
-
 <body class="overflow-auto h-screen w-screen">
+    <!-- Template JINJA2, Bootstrap and Tailwind page for an employe-->
+    <!-- Will contain the name of the employee, the company he works for, and a table for his monthly paycheck-->
+    <!-- Will also have a button to delete the employee-->
+
     <div id="app-grid" class="flex">
         <aside id="sidenav" class="col-span-1 h-screen fixed">
             <!--    LG NAV  -->
@@ -65,7 +66,7 @@
 
                     <div class="border-t">
                         <a href="/upload"
-                            class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white focus:outline-none focus:ring active:text-blue-500"
+                            class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white  focus:outline-none focus:ring active:text-blue-500"
                             id="uploadDocument">
                             <span class="text-sm font-medium"> Incarca document </span>
 
@@ -185,120 +186,176 @@
             </div>
         </aside>
 
+
         <div id="app-content" class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56">
-            
-            <!--    todo: modify the icon   -->
-            <div class="top-content h-12 mb-10">
-                <div class="header-row flex mb-2">
-                    <div class="page-icon mr-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice"
-                            width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                            fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                            <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
-                            <path d="M9 7l1 0"></path>
-                            <path d="M9 13l6 0"></path>
-                            <path d="M13 17l2 0"></path>
-                        </svg>
+            <div class="top-content min-h-12 mb-10">
+                <div class="header-row flex mb-2 justify-between">
+                    <div class="flex">
+                        <div class="page-icon mr-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-invoice"
+                                width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+                                <path d="M9 7l1 0"></path>
+                                <path d="M9 13l6 0"></path>
+                                <path d="M13 17l2 0"></path>
+                            </svg>
+                        </div>
+                        <h1 class="page-header text-lg font-medium">
+                            {{ nume }}
+                        </h1>
                     </div>
-                    <h1 class="page-header text-lg font-medium">
-                        Salariati
-                    </h1>
+                    <!-- Delete button -->
+                    <button id="deleteSalariat" class="btn btn-danger">
+                        Sterge salariat
+                    </button>
                 </div>
                 <hr />
             </div>
 
-            <!--    SALARIATI TABLE    -->
-            <div id="salariaytiTable">
-
-                <!--    A JINJA2 BOOTSTRAP TABLE WITH 2 COLUMNS: 'Salariat', 'Firma'-->
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Salariat</th>
-                                <th>Firma</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for salariat in salariati %}
-                            <tr>
-                                <td>
-                                    <a class="link-primary" href="/salariat/{{ salariat.ID }}">{{ salariat.nume }}</a>
-                                </td>
-                                <td>{{ salariat.firma }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        <!-- A last row with a button to add a new entry. The id will be #addSalariatButton-->
-                        <tfoot>
-                            <tr>
-                                <td colspan="2">
-                                    <button id="addSalariatButton" class="btn btn-primary">Adauga salariat</button>
-                                </td>
-                            </tr>
-                    </table>
-
+            <h3 class="text-xl font-bold mb-10">Companie salariat:</h3>
+            <div class="flex mb-10">
+                <input id="salariat__companie" type="text" value="{{ companie }}" class="mt-1 mr-5 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                <button id="submitCompanie" class="btn btn-success">
+                    Modifica compania
+                </button>
             </div>
 
-        </div>
+    
+            <h3 class="text-xl font-bold mb-10">Salarii angajat</h3>
+    
+            <!-- Table with the following columns: Luna, Salariu, Bonus-->
+            <!-- Each value must be editable and updated to the server afterwards, probably through a button-->
+            <div class="table-container mb-5 overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
+                    <thead>
+                        <tr>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Luna</th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Salariu</th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Bonus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for salariu in salarii %}
+                        <tr class="odd:bg-gray-50">
+                            <th id="salariu__luna" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ salariu.luna }}</th>
+                            <td>
+                                <input id="salariu__valoare" type="number" value="{{ salariu.salariu }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                            </td>
+                            <td>
+                                <input id="salariu__bonus" type="number" value="{{ salariu.bonus }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        <!-- Submit changes button-->
+        <button id="submitSalarii" class="btn btn-success">
+            Salveaza modificarile
+        </button>
 
     </div>
 
     <script async>
-        // We will select the button and will display an alert when it is clicked
-        // The alert will prompt the user to enter the name of the new salariat and the name of the firma
-        // The alert will also have a button to cancel the operation
-        // When the user clicks the button, we will send a POST request to the server with the data
-        // The server will add the new salariat to the database and will return the new salariat's id
-        // We will then add a new row to the table with the new salariat's name and firma
-        // We will also add a link to the salariat's page
+        const ID_ANGAJAT = parseInt("{{ id_angajat }}");    //  Ca sa nu avem erori
 
-        const addSalariatButton = document.querySelector('#addSalariatButton');
 
-        addSalariatButton.addEventListener('click', () => {
-            const salariatName = prompt('Introduceti numele salariatului');
-            const firmaName = prompt('Introduceti numele firmei');
+        // Delete salariat
+        document.getElementById("deleteSalariat").addEventListener("click", async function () {
+            var r = confirm("Esti sigur ca vrei sa stergi acest salariat?");
 
-            if (salariatName && firmaName) {
-                // Send a POST request to the server
-                fetch('/api/cashflow/add/angajat', {
-                    method: 'POST',
+
+
+            if (r == true) {
+                const response = await fetch('/api/cashflow/delete/salariat', {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json'
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        nume: salariatName,
-                        firma: firmaName
+                        id: ID_ANGAJAT
                     })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data['status'] != "OK") {
-                            alert('A aparut o eroare la adaugarea salariatului');
-                            return;
-                        }
+                });
 
-                        // Add a new row to the table
-                        const tableBody = document.querySelector('tbody');
-                        const newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <td>
-                                <a class="link-primary" href="/salariat/${data["data"].ID}">${salariatName}</a>
-                            </td>
-                            <td>${firmaName}</td>
-                        `;
-                        tableBody.appendChild(newRow);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                let response_json = await response.json();
+
+                if(response_json["status"] != "OK" || response.status != 200) {
+                    alert("A aparut o eroare la stergerea salariatului!");
+                } else {
+                    alert("Salariatul a fost sters cu succes!");
+                    window.location.href = "/salariati";
+                }
             }
         });
-        
+
+        // Submit changes
+        document.getElementById("submitSalarii").addEventListener("click", async () => {
+            console.log("Salveaza modificarile");
+            var salarii = document.querySelectorAll("tbody tr");
+            var salariiArray = [];
+            salarii.forEach(function (entry) {
+                var luna = entry.querySelector("#salariu__luna").innerText;
+                var salariu = entry.querySelector("#salariu__valoare").value;
+                var bonus = entry.querySelector("#salariu__bonus").value;
+                salariiArray.push({
+                    luna: luna,
+                    salariu: salariu,
+                    bonus: bonus
+                });
+            });
+
+            const sendBody = {
+                angajatID: ID_ANGAJAT,
+                an: new Date().getFullYear(),
+                companie: "{{ companie }}",
+                salarii: salariiArray
+            };
+
+            const response = await fetch('/api/cashflow/update/salariu', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendBody)
+            });
+
+            if (response.status == 200) {
+                alert("Salariile au fost actualizate cu succes!");
+            } else {
+                alert("A aparut o eroare la actualizarea salariilor!");
+            }
+        });
+    
+        // Submit company
+        document.getElementById("submitCompanie").addEventListener("click", async () => {
+            console.log("Salveaza compania");
+            var companie = document.getElementById("salariat__companie").value;
+
+            const sendBody = {
+                id: ID_ANGAJAT,
+                firma: companie,
+                nume: "{{ nume }}"
+            };
+
+            const response = await fetch('/api/cashflow/update/salariat', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendBody)
+            });
+
+            if (response.status == 200) {
+                alert("Compania a fost actualizata cu succes!");
+            } else {
+                alert("A aparut o eroare la actualizarea companiei!");
+            }
+        });
     </script>
-
+    
 </body>
-
 </html>

@@ -81,7 +81,7 @@
             <div class="border-t">
               <a
                 href="/upload"
-                class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                class="cursor-pointer mt-5 inline-flex items-center gap-2 rounded border border-blue-600 bg-blue-600 px-8 py-3 text-white focus:outline-none focus:ring active:text-blue-500"
                 id="uploadDocument"
               >
                 <span class="text-sm font-medium"> Incarca document </span>
@@ -126,7 +126,7 @@
                 <div class="py-4">
                   <a
                     href="/acasa"
-                    class="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700"
+                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -158,7 +158,7 @@
                   <li>
                     <a
                       href="/tranzactii"
-                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                      class="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -320,8 +320,6 @@
 
             <!--    DATA    -->
 
-            <div id="selectZi"></div>
-
             <div id="selectLuna"></div>
 
             <div id="selectAn"></div>
@@ -404,13 +402,6 @@
       //   "Zi",
       //   Array(31).fill().map((_, i) => i + 1),
       // );
-      let ziInput = TextInput.create(
-        "#selectZi",
-        "search",
-        "Zi",
-        "Introduceti ziua",
-        "number"
-      );
 
       let lunaInput = TextInput.create(
         "#selectLuna",
@@ -612,11 +603,9 @@
               //  Create a static table for the dropdown
               let staticTable = new StaticTable(["Firma", "Valori"], [], false);
 
-              staticTable.update(...[
-                //  Map the sums from all the companies
-                ...Object.keys(jsonData[key]["firma"]).map((firma) => {
+              let thisData = Object.keys(jsonData[key]["firma"]).map((firma) => {
                   //  console.log([firma, jsonData[key]["firma"][firma]]);
-                  console.log(typeof jsonData[key]['firma'][firma], jsonData[key]["firma"][firma]);
+                  console.log("Firma: ", firma, typeof jsonData[key]['firma'][firma], jsonData[key]["firma"][firma]);
 
                   let firmaEntries = jsonData[key]["firma"][firma];
                   let dateFirma = [];
@@ -625,7 +614,7 @@
                     let entry = firmaEntries[i];
                     console.log("entry", entry);
 
-                    dateFirma.push(...[
+                    dateFirma.push(...
                       [
                         firma,
                         entry,
@@ -695,14 +684,22 @@
                           _removeUIrow();
                         }).htmlElement,
                       ]
-                      ]);
+                      );
                   }
-
+                  
+                  //  Parse the price
+                  dateFirma[1] = parseFloat(dateFirma[1]).toFixed(2);
 
                   console.log("Date firma", dateFirma);
-                  return [...dateFirma];
-                }),
-              ]);
+                  return [...[...dateFirma]];
+                });
+
+              console.log("This data", thisData);
+
+              staticTable.update(
+                // Give the whole matrix
+                thisData
+              );
 
               let dropdown = new Dropdown(
                 "Detalii",
@@ -713,7 +710,7 @@
               updatedData.push([
                 `${jsonData[key]["zi"]}-${jsonData[key]["luna"]}-${jsonData[key]["an"]}`,
                 dropdown.htmlElement,
-                jsonData[key]["suma"],
+                parseFloat(jsonData[key]["suma"]).toFixed(2),
               ]);
             };
 
@@ -819,6 +816,9 @@
 
             //  Add the initial sum to the total
             total += parseFloat(sumaInitiala);
+
+            //  Let the total be just 2 decimals
+            total = total.toFixed(2);
 
             total = `<b>${total} RON</b>`;
 
