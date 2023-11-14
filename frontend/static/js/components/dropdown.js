@@ -1,14 +1,13 @@
 class Dropdown {
+  constructor(name, elements) {
+    this.name = name;
+    this.elements = elements;
+    this.isOpen = false;
 
-    constructor(name, elements) {
-        this.name = name;
-        this.elements = elements;
-        this.isOpen = false;
+    let element = document.createElement("div");
+    element.classList = "relative";
 
-        let element = document.createElement('div');
-        element.classList = "relative";
-
-        let closedDropdownHTML = `
+    let closedDropdownHTML = `
         <div
           class="inline-flex items-center overflow-hidden rounded-md border bg-white"
         >
@@ -39,10 +38,10 @@ class Dropdown {
         </div>
         `;
 
-        let openDropdownHTML = `
+    let openDropdownHTML = `
         <div
         id="closedPart"
-        class="hidden absolute overflow-auto end-0 z-10 mt-2 w-56 h-36 rounded-md border border-gray-100 bg-white shadow-lg"
+        class="hidden absolute overflow-auto end-0 z-10 mt-2 w-56 lg:w-80 h-36 lg:h-48 rounded-md border border-gray-100 bg-white shadow-lg"
         role="menu"
       >
         <div id="elements" class="p-2">
@@ -52,29 +51,27 @@ class Dropdown {
     </div>
         `;
 
-        element.innerHTML = closedDropdownHTML + openDropdownHTML;
+    element.innerHTML = closedDropdownHTML + openDropdownHTML;
 
-        //  Add the elements
-        let elementsDiv = element.querySelector('#elements');
-        for(let element of this.elements) {
-            console.log(element);
-            try {
-                elementsDiv.appendChild(element);
-            }
-            catch {
-                elementsDiv.innerHTML += element;
-            }
-        }
-
-        let button = element.querySelector('#dropdownButton');
-
-        button.addEventListener('click', () => {
-            let closedPart = element.querySelector('#closedPart');
-            
-            closedPart.classList.toggle('hidden');
-        });
-
-        this.htmlElement = element;
-
+    //  Add the elements
+    let elementsDiv = element.querySelector("#elements");
+    for (let element of this.elements) {
+      console.log(element);
+      try {
+        elementsDiv.appendChild(element);
+      } catch {
+        elementsDiv.innerHTML += element;
+      }
     }
+
+    let button = element.querySelector("#dropdownButton");
+
+    button.addEventListener("click", () => {
+      let closedPart = element.querySelector("#closedPart");
+
+      closedPart.classList.toggle("hidden");
+    });
+
+    this.htmlElement = element;
+  }
 }
