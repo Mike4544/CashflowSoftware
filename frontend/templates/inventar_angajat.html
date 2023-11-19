@@ -66,6 +66,15 @@
                                 Salariati
                             </a>
                         </li>
+
+                        <li>
+                            <a
+                              href="/inventar"
+                              class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                            >
+                              Inventar
+                            </a>
+                          </li>
                     </ul>
 
                     <div class="border-t">
@@ -250,32 +259,55 @@
                             {{ nume }}
                         </h1>
                     </div>
-                    <!-- Delete button -->
-                    <button id="deleteSalariat" class="btn btn-danger">
-                        Sterge salariat
-                    </button>
                 </div>
                 <hr />
             </div>
 
-            <h3 class="text-xl font-bold mb-10">Companie salariat:</h3>
+            <h3 class="text-xl font-bold mb-1">Companie salariat:</h3>
             <div class="flex mb-10">
-                <input id="salariat__companie" type="text" value="{{ companie }}" class="mt-1 mr-5 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
-                <button id="submitCompanie" class="btn btn-success">
-                    Modifica compania
-                </button>
+                <h3 class="text-lg opacity-50 font-bold mb-10 mr-5">{{ companie }}</h3>
             </div>
 
     
-            <h3 class="text-xl font-bold mb-10">Salarii angajat</h3>
+            <h3 class="text-xl font-bold mb-10">Inventar angajat</h3>
+            <script>
+                function deleteItem__local(e) {
+                    const row = e.target.closest("tr");
 
-            <div class="flex mb-10">
-                <input id="salariat__an" type="number" value="{{ an }}" class="mt-1 mr-5 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
-                <button id="cautaSalarii" class="btn btn-primary">
-                    <span><i class="bi bi-search"></i></span>
-                    Cauta
-                </button>
-            </div>
+                    //  Remove from actions
+                    const nume = row.querySelector("#item__nume").textContent;
+                    const cantitate = parseInt(row.querySelector("#item__cantitate").value);
+                    const valoare = parseInt(row.querySelector("#item__valoare").value);
+
+                    actions = actions.filter((action) => {
+                        return action.nume != nume && action.cantitate != cantitate && action.valoare != valoare;
+                    });
+
+                    row.remove();
+
+                }
+
+                function deleteItem__server(e) {
+                    const row = e.target.closest("tr");
+                    const nume = row.querySelector("#item__nume").textContent;
+                    const cantitate = parseInt(row.querySelector("#item__cantitate").value);
+                    const valoare = parseFloat(row.querySelector("#item__valoare").value).toFixed(2);
+
+                    const data = {
+                        "action": "delete",
+                        "id_angajat": ID_ANGAJAT,
+                        'id_item': row.attributes.itemid.value,
+                        "nume": nume,
+                        "cantitate": cantitate,
+                        "valoare": valoare
+                    };
+
+                    actions.push(data);
+
+                    // Delete the row
+                    row.remove();
+                }
+            </script>
     
             <!-- Table with the following columns: Luna, Salariu, Bonus-->
             <!-- Each value must be editable and updated to the server afterwards, probably through a button-->
@@ -283,210 +315,255 @@
                 <table class="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
                     <thead>
                         <tr>
-                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Luna</th>
-                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Salariu</th>
-                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Bonus</th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Obiect</th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Cantitate</th>
+                            <th class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Valoare</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for salariu in salarii %}
-                        <tr class="odd:bg-gray-50">
-                            <th id="salariu__luna" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ salariu.luna }}</th>
+                        {% for obiect in inventar %}
+                        <tr class="odd:bg-gray-50" itemid="{{ obiect.id }}">
+                            <th id="item__nume" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{{ obiect.nume }}</th>
                             <td>
-                                <input id="salariu__valoare" type="number" value="{{ salariu.salariu }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                                <input id="item__cantitate" type="number" value="{{ obiect.cantitate }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
                             </td>
                             <td>
-                                <input id="salariu__bonus" type="number" value="{{ salariu.bonus }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                                <input id="item__valoare" type="number" value="{{ obiect.valoare }}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                            </td>
+                            <td>
+                                <button id="deleteItem" class="btn btn-danger">
+                                    <span><i class="bi bi-trash"></i></span>
+                                    Sterge
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
+                    <tfoot>
+                        <!-- Inputs to add new object and quantity -->
+                        <tr class="odd:bg-gray-50">
+                            <form>
+                                <th id="item__" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                                    <input id="newItem__nume" type="text" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                                </th>
+                                <td>
+                                    <input id="newItem__cantitate" type="number" required class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                                </td>
+                                <td>
+                                    <input id="newItem__valoare" type="number" step="0.01" required class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                                </td>
+
+                                <td>
+                                    <button id="addItem" class="btn btn-success">
+                                        <span><i class="bi bi-plus"></i></span>
+                                        Adauga
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
-
-        <!-- Submit changes button-->
-        <button id="submitSalarii" class="btn btn-success">
-            Salveaza modificarile
-        </button>
+            <div class="flex justify-end mt-5">
+                <button id="saveChanges" class="btn btn-success">
+                    <span><i class="bi bi-save"></i></span>
+                    Salveaza
+                </button>
+            </div>
 
     </div>
 
     <script async>
+
+        //  Add the delete event to the delete buttons
+        const deleteButtons = document.querySelectorAll("#deleteItem");
+
+        deleteButtons.forEach((button) => {
+            button.addEventListener("click", (e) => {
+                deleteItem__server(e);
+            });
+        });
+
+
+
         const ID_ANGAJAT = parseInt("{{ id_angajat }}");    //  Ca sa nu avem erori
 
+        const addItem = document.getElementById("addItem");
+        const saveChanges = document.getElementById("saveChanges");
 
-        // Search for salaries
-        document.getElementById("cautaSalarii").addEventListener("click", async () => {
+        const newItem__nume = document.getElementById("newItem__nume");
+        const newItem__cantitate = document.getElementById("newItem__cantitate");
+        const newItem__valoare = document.getElementById("newItem__valoare");
 
-            //  Set the table body to loading
-            document.querySelector("tbody").innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </td>
-                </tr>
+        const form = document.querySelector("form");
+
+        var actions = [];
+
+
+
+        async function saveAllChanges() {
+            //  First, add all data from modified cells to actions
+            var modifiedRows = document.querySelectorAll(".modified");
+            
+            // Remove the added cells
+            modifiedRows = Array.from(modifiedRows).filter((cell) => {
+                return !cell.classList.contains("added");
+            });
+
+            modifiedRows.forEach((cell) => {
+                const row = cell.closest("tr");
+                const nume = row.querySelector("#item__nume").textContent;
+                const cantitate = parseInt(row.querySelector("#item__cantitate").value);
+                const valoare = parseFloat(row.querySelector("#item__valoare").value).toFixed(2);
+
+                const data = {
+                    "action": "update",
+                    "id_angajat": ID_ANGAJAT,
+                    "id_item": row.attributes.itemid.value,
+                    "nume": nume,
+                    "cantitate": cantitate,
+                    "valoare": valoare
+                };
+
+                actions.push(data);
+            });
+
+
+            // Get the added cells
+            const addedRows = document.querySelectorAll(".added");
+            
+            addedRows.forEach((row) => {
+
+                const nume = row.querySelector("#item__nume").textContent;
+                const cantitate = parseInt(row.querySelector("#item__cantitate").value);
+                const valoare = parseFloat(row.querySelector("#item__valoare").value).toFixed(2);
+
+                const data = {
+                    "action": "add",
+                    "id_angajat": ID_ANGAJAT,
+                    "nume": nume,
+                    "cantitate": cantitate,
+                    "valoare": valoare
+                };
+
+                actions.push(data);
+            });
+
+            //   Check if there are any actions to be sent
+            if(actions.length == 0) {
+                alert("Nu ai facut nicio modificare!");
+                return;
+            }
+
+
+            //  Send the actions to the server
+            const response = await fetch("/api/cashflow/add/inventar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(actions)
+            });
+
+            const data = await response.json();
+
+            if(data.status != "OK") {
+                alert("A aparut o eroare la salvarea datelor!");
+                return;
+            }
+
+            alert("Datele au fost salvate cu succes!");
+            actions = [];
+        }
+
+
+        saveChanges.addEventListener("click", (e) => {
+            saveAllChanges();
+        });
+
+
+        addItem.addEventListener("click", (e) => {
+    
+            const nume = newItem__nume.value;
+            const cantitate = parseInt(newItem__cantitate.value);
+            const _valoare = parseFloat(newItem__valoare.value).toFixed(2);
+
+            if(!form.checkValidity()) {
+                alert("Nu ai completat toate campurile!");
+                return;
+            }
+
+            const row = document.createElement("tr");
+            row.classList.add("odd:bg-gray-50");
+            row.classList.add("added");
+
+            row.innerHTML = `
+                <th id="item__nume" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">${nume}</th>
+                <td>
+                    <input id="item__cantitate" type="number" value="${cantitate}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                </td>
+                <td>
+                    <input id="item__valoare" type="number" step="0.01" value="${_valoare}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
+                </td>
+                <td>
+                    <button id="deleteItem" class="btn btn-danger">
+                        <span><i class="bi bi-trash"></i></span>
+                        Sterge
+                    </button>
+                </td>
             `;
 
-            console.log("Cauta salarii");
-            var an = document.getElementById("salariat__an").value;
+            document.querySelector("tbody").appendChild(row);
 
-            const sendBody = {
-                angajatID: ID_ANGAJAT,
-                an: an
-            };
+            //  Add the delete event to the delete button
+            const deleteButton = row.querySelector("#deleteItem");
 
-            const response = await fetch('/api/cashflow/get/salariu', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(sendBody)
+            deleteButton.addEventListener("click", (e) => {
+                deleteItem__local(e);
             });
 
-            if (response.status == 200) {
-                let response_json = await response.json();
-                console.log(response_json);
-                
-                //  Reconstruct the table based on month
-                let data = {};
+            //  Add the event modifier to the cells
+            const cells = row.querySelectorAll("td");
 
-                response_json.forEach(function (entry) {
-                    data[entry["luna"]] = {
-                        salariu: entry["salariu"],
-                        bonus: entry["bonus"]
-                    };
-                });
-
-                //  Check again and make sure missing months are 0
-                for(let i = 1; i <= 12; i++) {
-                    if(data[i] == undefined) {
-                        data[i] = {
-                            salariu: 0,
-                            bonus: 0
-                        };
+            cells.forEach((cell) => {
+                cell.addEventListener("change", (e) => {
+                    if(!cell.classList.contains("modified")) {
+                        cell.classList.add("modified");
+                        modifiedCells.push(cell);
                     }
-                }
-
-                //  Reconstruct the table
-                let table = document.querySelector("tbody");
-                table.innerHTML = "";
-
-                for(let i = 1; i <= 12; i++) {
-                    table.innerHTML += `
-                        <tr class="odd:bg-gray-50">
-                            <th id="salariu__luna" class="whitespace-nowrap px-4 py-2 font-medium text-gray-900">${i}</th>
-                            <td>
-                                <input id="salariu__valoare" type="number" value="${data[i]["salariu"]}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
-                            </td>
-                            <td>
-                                <input id="salariu__bonus" type="number" value="${data[i]["bonus"]}" class="mt-1 w-1/2 rounded-md border-gray-200 shadow-sm sm:text-sm" />
-                            </td>
-                        </tr>
-                    `;
-                }
-
-            } else {
-                alert("A aparut o eroare la cautarea salariilor!");
-            }
-        });
-
-
-        // Delete salariat
-        document.getElementById("deleteSalariat").addEventListener("click", async function () {
-            var r = confirm("Esti sigur ca vrei sa stergi acest salariat?");
-
-
-
-            if (r == true) {
-                const response = await fetch('/api/cashflow/delete/salariat', {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        id: ID_ANGAJAT
-                    })
-                });
-
-                let response_json = await response.json();
-
-                if(response_json["status"] != "OK" || response.status != 200) {
-                    alert("A aparut o eroare la stergerea salariatului!");
-                } else {
-                    alert("Salariatul a fost sters cu succes!");
-                    window.location.href = "/salariati";
-                }
-            }
-        });
-
-        // Submit changes
-        document.getElementById("submitSalarii").addEventListener("click", async () => {
-            console.log("Salveaza modificarile");
-            var salarii = document.querySelectorAll("tbody tr");
-            var salariiArray = [];
-            salarii.forEach(function (entry) {
-                var luna = entry.querySelector("#salariu__luna").innerText;
-                var salariu = entry.querySelector("#salariu__valoare").value;
-                var bonus = entry.querySelector("#salariu__bonus").value;
-                salariiArray.push({
-                    luna: luna,
-                    salariu: salariu,
-                    bonus: bonus
                 });
             });
 
-            const sendBody = {
-                angajatID: ID_ANGAJAT,
-                an: document.getElementById("salariat__an").value,
-                companie: "{{ companie }}",
-                salarii: salariiArray
-            };
-
-            const response = await fetch('/api/cashflow/update/salariu', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(sendBody)
-            });
-
-            if (response.status == 200) {
-                alert("Salariile au fost actualizate cu succes!");
-            } else {
-                alert("A aparut o eroare la actualizarea salariilor!");
-            }
+            newItem__nume.value = "";
+            newItem__cantitate.value = "";
+            newItem__valoare.value = "";
         });
-    
-        // Submit company
-        document.getElementById("submitCompanie").addEventListener("click", async () => {
-            console.log("Salveaza compania");
-            var companie = document.getElementById("salariat__companie").value;
 
-            const sendBody = {
-                id: ID_ANGAJAT,
-                firma: companie,
-                nume: "{{ nume }}"
-            };
 
-            const response = await fetch('/api/cashflow/update/salariat', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(sendBody)
+
+        //  For each cell, add an event listener to detect changes
+        const rows = document.querySelectorAll("tbody tr");
+
+        rows.forEach((row) => {
+
+            let cells = row.querySelectorAll("td");
+
+            cells.forEach((cell) => {
+                cell.addEventListener("change", (e) => {
+                    if(!cell.classList.contains("modified")) {
+                        cell.classList.add("modified");
+                        modifiedCells.push(cell);
+                    }
+
+                    cell.attributes
+                });
             });
+            });
+        
 
-            if (response.status == 200) {
-                alert("Compania a fost actualizata cu succes!");
-            } else {
-                alert("A aparut o eroare la actualizarea companiei!");
-            }
-        });
     </script>
     <script src="{{ url_for('static', filename='js/background.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/pageTransition.js') }}"></script>
-
+    
+    
 </body>
 </html>

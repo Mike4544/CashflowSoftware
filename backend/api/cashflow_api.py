@@ -73,6 +73,7 @@ async def create_cashflow_table() -> bool:
             CREATE TABLE IF NOT EXISTS Intrari (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 TIP VARCHAR(25) DEFAULT 'Intrare',
+                URGENT BOOLEAN DEFAULT FALSE,
                 Zi INTEGER NOT NULL,
                 Luna INTEGER NOT NULL,
                 An INTEGER NOT NULL,
@@ -87,6 +88,7 @@ async def create_cashflow_table() -> bool:
             CREATE TABLE IF NOT EXISTS Iesiri (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 TIP VARCHAR(25) DEFAULT 'Iesire',
+                URGENT BOOLEAN DEFAULT FALSE,
                 Zi INTEGER NOT NULL,
                 Luna INTEGER NOT NULL,
                 An INTEGER NOT NULL,
@@ -146,6 +148,18 @@ async def create_cashflow_table() -> bool:
                 """
             )
 
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS Inventar (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Nume VARCHAR(255),
+                    Cantitate INTEGER DEFAULT 0,
+                    Valoare DECIMAL(10, 2) DEFAULT 0,
+                    IdAngajat INTEGER
+                );
+                """
+            )
+
 
     except Exception as e:
         print(e)
@@ -163,6 +177,7 @@ async def insert_intrare(
         val: float,
         tva: float,
         total: float,
+        isUrgent: bool = False,
         db_connection: Database = None
 ) -> list[tuple]:
 
@@ -184,9 +199,9 @@ async def insert_intrare(
             query = Query.into(
                 'Intrari'
             ).columns(
-                'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
+                'URGENT', 'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
             ).insert(
-                (*data, companie, val, tva, total)
+                (isUrgent, *data, companie, val, tva, total)
             )
 
             return await db_connection.query_async(query.get_sql())
@@ -196,9 +211,9 @@ async def insert_intrare(
             query = Query.into(
                 'Intrari'
             ).columns(
-                'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
+                'URGENT', 'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
             ).insert(
-                (*data, companie, val, tva, total)
+                (isUrgent, *data, companie, val, tva, total)
             )
 
             return await db.query_async(query.get_sql())
@@ -213,7 +228,8 @@ async def insert_intrare_many(
                     str,
                     float,
                     float,
-                    float]
+                    float,
+                    bool]
             ],
         db_connection: Database = None
 ) -> list[tuple]:
@@ -263,6 +279,7 @@ async def insert_iesire(
         val: float,
         tva: float,
         total: float,
+        isUrgent: bool = False,
         db_connection: Database = None
 ) -> list[tuple]:
 
@@ -284,9 +301,9 @@ async def insert_iesire(
             query = Query.into(
                 'Iesiri'
             ).columns(
-                'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
+                'URGENT', 'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
             ).insert(
-                (*data, companie, val, tva, total)
+                (isUrgent, *data, companie, val, tva, total)
             )
 
             return await db_connection.query_async(query.get_sql())
@@ -296,9 +313,9 @@ async def insert_iesire(
             query = Query.into(
                 'Iesiri'
             ).columns(
-                'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
+                'URGENT', 'Zi', 'Luna', 'An', 'Companie', 'Valoare', 'TVA', 'Total'
             ).insert(
-                (*data, companie, val, tva, total)
+                (isUrgent, *data, companie, val, tva, total)
             )
 
             return await db.query_async(query.get_sql())
@@ -314,7 +331,8 @@ async def insert_iesire_many(
                         str,
                         float,
                         float,
-                        float]
+                        float,
+                        bool]
                 ],
         db_connection: Database = None
 ) -> list[tuple]:
@@ -532,7 +550,66 @@ async def insert_salariu(
     except Exception as e:
         print(e)
         return []
-    
+
+async def insert_inventar(
+        nume: str,
+        cantitate: int,
+        valoare: float,
+        id_angajat: int,
+        db_connection: Database = None
+):
+
+        table = Table("Inventar")
+
+        query = Query.into(table).columns(
+            "Nume", "Cantitate", "Valoare", "IdAngajat"
+        ).insert(
+            nume, cantitate, valoare, id_angajat
+        )
+
+        try:
+            if db_connection:
+                return await db_connection.query_async(query.get_sql())
+
+            with Database(DB_PATH) as db:
+                return await db.query_async(query.get_sql())
+
+        except Exception as e:
+            print(e)
+            return []
+
+async def insert_inventar_many(
+        inventar: list[
+            tuple[
+                str, int, float, int
+                ]
+            ],
+        db_connection: Database = None
+) -> bool:
+
+    try:
+        if db_connection:
+            for item in inventar:
+                await insert_inventar(
+                    *item,
+                    db_connection=db_connection
+                )
+            return True
+
+        else:
+            with Database(name=DB_PATH) as db:
+                for item in inventar:
+                    await insert_inventar(
+                        *item,
+                        db_connection=db
+                    )
+            return True
+
+    except Exception as e:
+        print(e)
+        return False
+
+
 async def insert_salariu_many(
         salarii: list[
             tuple[
@@ -574,6 +651,7 @@ async def get_intrari(
         luna: int= None,
         an: int = None,
         firma: str = None,
+        only_urgent: bool = False,
         db_connection: Database = None
 ) -> list[list[tuple]]:
 
@@ -615,6 +693,11 @@ async def get_intrari(
                 table.Companie == firma
             )
 
+        if only_urgent:
+            query = query.where(
+                table.URGENT == True
+            )
+
         if db_connection:
             return await db_connection.query_async(query.get_sql())
 
@@ -631,6 +714,7 @@ async def get_iesiri(
         luna: int = None,
         an: int = None,
         firma: str = None,
+        only_urgent: bool = False,
         db_connection: Database = None
 ) -> list[list[tuple]]:
 
@@ -670,6 +754,11 @@ async def get_iesiri(
                 table.Companie == firma
             )
 
+        if only_urgent:
+            query = query.where(
+                table.URGENT == True
+            )
+
 
         if db_connection:
             entries = await db_connection.query_async(query.get_sql())
@@ -692,13 +781,13 @@ async def get_iesiri(
         # In a 10-a a lunii, add 1/3 of the salaries to the total
         third = sum / 3
         entries.append(
-            (-99, 'Iesire', 10, luna or datetime.now().month, an or datetime.now().year, 'Salarii', third, 0,
+            (-99, 'Iesire', False,  10, luna or datetime.now().month, an or datetime.now().year, 'Salarii', third, 0,
              sum / 3)
         )
 
         # In a 25-a a lunii, add 2/3 of the salaries to the total
         entries.append(
-            (-99, 'Iesire', 25, luna or datetime.now().month, an or datetime.now().year, 'Salarii', 2 * third, 0,
+            (-99, 'Iesire', False, 25, luna or datetime.now().month, an or datetime.now().year, 'Salarii', 2 * third, 0,
              sum * 2 / 3)
         )
 
@@ -893,6 +982,26 @@ async def get_salarii(
         print(e)
         return []
 
+async def get_inventar(
+        id_angajat: list[int] = None,
+        db_connection: Database = None
+):
+
+    db = db_connection or Database(DB_PATH)
+
+    table = Table("Inventar")
+    query = Query.from_(table).select('*')
+
+    if id_angajat:
+        query = query.where(
+            table.IdAngajat.isin(id_angajat)
+        )
+
+    try:
+        return await db.query_async(query.get_sql())
+    except Exception as e:
+        print(e)
+        return []
 
 
 #   =================================================================
@@ -1089,6 +1198,43 @@ async def update_salariu(
         print(e)
         return []
 
+async def update_inventar(
+        id_angajat: int,
+        id_item: int,
+        new_nume: str = None,
+        new_cantitate: int = None,
+        new_valoare: float = None,
+        new_id_angajat: int = None,
+        db_connection: Database = None
+) -> list[tuple]:
+
+    query = Query.update('Inventar')
+    if new_nume:
+        query = query.set('Nume', new_nume)
+    if new_cantitate:
+        query = query.set('Cantitate', new_cantitate)
+    if new_valoare:
+        query = query.set('Valoare', new_valoare)
+    if new_id_angajat:
+        query = query.set('IdAngajat', new_id_angajat)
+
+    query = query.where(
+        (Field('IdAngajat') == id_angajat) & (Field('ID') == id_item)
+    )
+
+    try:
+        if db_connection:
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
 
 #   Delete operations
 async def delete_intrare(
@@ -1216,6 +1362,31 @@ async def delete_salariu(
         with Database(DB_PATH) as db:
             query = Query.from_('Salarii').where(
                 (Field('Luna') == luna) & (Field('An') == an) & (Field('IdAngajat') == id_angajat) & (Field('Companie') == companie)
+            ).delete()
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+async def delete_inventar(
+        id_item: int,
+        id_angajat: int,
+        db_connection: Database = None
+):
+
+    try:
+        if db_connection:
+            query = Query.from_('Inventar').where(
+                (Field('ID') == id_item) & (Field('IdAngajat') == id_angajat)
+            ).delete()
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.from_('Inventar').where(
+                (Field('ID') == id_item) & (Field('IdAngajat') == id_angajat)
             ).delete()
 
             return await db.query_async(query.get_sql())

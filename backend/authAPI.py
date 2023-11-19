@@ -1,4 +1,4 @@
-from quart import Quart, request, jsonify, Blueprint, make_response
+from quart import Quart, redirect, request, jsonify, Blueprint, make_response
 
 auth_api = Blueprint('auth_api', __name__)
 
@@ -16,11 +16,15 @@ async def auth():
     # Check if the password is correct
     if password == DEFAULT_PASS:
         # Set the auth cooke
-        response = await make_response()
+        response = await make_response(
+            jsonify({
+                'status': 'success',
+                'message': 'Autentificare reusita'
+            })
+        )
         response.set_cookie('authed', 'true', max_age=60*5)
 
-        response.headers['location'] = '/salariati'
-        return response, 302
+        return response
     else:
         # Return an error
         return jsonify({

@@ -22,7 +22,8 @@ async def get_intrari():
     raw_data = await cAPI.get_intrari(
             firma=request_json['firma'],
             luna=request_json['luna'],
-            an=request_json['an']
+            an=request_json['an'],
+            only_urgent=request_json.get('onlyUrgents', False)
         )
 
     print(raw_data)
@@ -31,15 +32,17 @@ async def get_intrari():
     data = {}
 
     for entry in raw_data:
-        id, tip, zi, luna, an, firma, suma, tva, total = entry
+        id, tip, isUrgent, zi, luna, an, firma, suma, tva, total = entry
 
         if zi not in data:
             data[zi] = {}
 
         firme_zi = data[zi].get("firma", {})
+        firme_zi[firma] = firme_zi.get(firma, {})
 
-        firme_zi[firma] = firme_zi.get(firma, [])
-        firme_zi[firma].append(suma)
+        firme_zi[firma]['sume'] = firme_zi[firma].get('sume', [])
+        firme_zi[firma]['sume'].append(suma)
+        firme_zi[firma]['isUrgent'] = isUrgent
 
         suma_zi = data[zi].get("suma", 0)
         suma_zi += suma
@@ -49,7 +52,8 @@ async def get_intrari():
             "suma": suma_zi,
             "zi": zi,
             "luna": luna,
-            "an": an
+            "an": an,
+            "hasUrgent": max([firme_zi[firma]['isUrgent'] for firma in firme_zi])
         }
 
     print(data)
@@ -65,24 +69,31 @@ async def get_iesiri():
     raw_data = await cAPI.get_iesiri(
             firma=request_json['firma'],
             luna=request_json['luna'],
-            an=request_json['an']
+            an=request_json['an'],
+            only_urgent=request_json.get('onlyUrgents', False)
         )
 
     print(raw_data)
 
     # Organize the data based on the "zi" index
     data = {}
+    hasUrgent = False
 
     for entry in raw_data:
-        id, tip, zi, luna, an, firma, suma, tva, total = entry
+        id, tip, isUrgent, zi, luna, an, firma, suma, tva, total = entry
+
+        if isUrgent == 1:
+            hasUrgent = True
 
         if zi not in data:
             data[zi] = {}
 
         firme_zi = data[zi].get("firma", {})
+        firme_zi[firma] = firme_zi.get(firma, {})
 
-        firme_zi[firma] = firme_zi.get(firma, [])
-        firme_zi[firma].append(suma)
+        firme_zi[firma]['sume'] = firme_zi[firma].get('sume', [])
+        firme_zi[firma]['sume'].append(suma)
+        firme_zi[firma]['isUrgent'] = isUrgent
 
         suma_zi = data[zi].get("suma", 0)
         suma_zi += suma
@@ -92,7 +103,8 @@ async def get_iesiri():
             "suma": suma_zi,
             "zi": zi,
             "luna": luna,
-            "an": an
+            "an": an,
+            "hasUrgent": hasUrgent
         }
 
     print(data)
@@ -110,7 +122,7 @@ async def get_recents():
     data = []
 
     for entry in raw_data:
-        id, tip, zi, luna, an, firma, suma, tva, total = entry
+        id, tip, isUrgent, zi, luna, an, firma, suma, tva, total = entry
 
         data.append(
             {
@@ -120,6 +132,7 @@ async def get_recents():
                 "firma": firma,
                 "suma": suma,
                 "tip": tip,
+                "isUrgent": isUrgent
             }
         )
 
@@ -212,7 +225,7 @@ async def __get_angajat(id):
 
     return data
 
-@api_routes.route('/api/cashflow/get/salariu')
+@api_routes.route('/api/cashflow/get/salariu', methods=['POST'])
 async def get_salariu():
     json_data = await request.get_json()
 
@@ -226,7 +239,7 @@ async def get_salariu():
             "luna": luna,
             "salariu": salariu,
             "bonus": bonus
-        } for luna, salariu, bonus in raw_data
+        } for  _, luna, _, _, _, salariu, bonus in raw_data
     ]
 
     return jsonify(data)
@@ -249,6 +262,8 @@ async def __get_salariu(an, angajati):
 
     return data
 
+
+# Maybe UNUSED
 @api_routes.route('/api/cashflow/get/salariiSum', methods=['POST'])
 async def get_salarii_sum():
     json_data = await request.get_json()
@@ -269,6 +284,37 @@ async def get_salarii_sum():
     }
 
     return jsonify(data)
+
+@api_routes.route('/api/cashflow/get/inventarAngajat', methods=['POST'])
+async def get_inventar():
+    json_data = await request.get_json()
+
+    raw_data = await cAPI.get_inventar_angajat(
+        angajat=json_data['angajatID']
+    )
+
+    data = [{
+        "nume": nume,
+        "cantitate": cantitate,
+        "valoare": valoare
+    } for _, nume, cantitate, valoare, _ in raw_data]
+
+    return jsonify(data)
+
+async def __get_inventar(angajat):
+    raw_data = await cAPI.get_inventar(
+        id_angajat=[angajat]
+    )
+
+    data = [{
+        "id": id,
+        "nume": nume,
+        "cantitate": cantitate,
+        "valoare": valoare
+    } for id, nume, cantitate, valoare, _ in raw_data]
+
+    return data
+
 
 #   =================================================================
 #   =================================================================
@@ -390,6 +436,7 @@ async def add_date():
             firma = entry['firma']
             tip = entry['tip']
             valoare = float(entry['valoare'])
+            urgent = entry['urgent']
 
             if tip == 'intrare':
                 await cAPI.insert_intrare(
@@ -398,6 +445,7 @@ async def add_date():
                     val=valoare,
                     tva=0,
                     total=valoare,
+                    isUrgent=urgent,
                     db_connection=db_conn
                 )
             elif tip == 'iesire':
@@ -407,6 +455,7 @@ async def add_date():
                     val=valoare,
                     tva=0,
                     total=valoare,
+                    isUrgent=urgent,
                     db_connection=db_conn
                 )
 
@@ -457,6 +506,57 @@ async def add_file():
        }
 
        return jsonify(body)
+
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/add/inventar', methods=['POST'])
+async def add_inventar():
+    json_data = await request.get_json()
+    print(json_data)
+
+    db_conn = cAPI.create_db_connection()
+
+    try:
+        for item in json_data:
+            print(item)
+
+            action = item['action']
+            print(action)
+
+            if action == 'add':
+                await cAPI.insert_inventar(
+                    id_angajat=item['id_angajat'],
+                    nume=item['nume'],
+                    cantitate=item['cantitate'],
+                    valoare=item['valoare'],
+                    db_connection=db_conn
+                )
+            elif action == 'update':
+                await cAPI.update_inventar(
+                    id_angajat=item['id_angajat'],
+                    id_item=item['id_item'],
+                    new_nume=item['nume'],
+                    new_cantitate=item['cantitate'],
+                    new_valoare=item['valoare'],
+                    db_connection=db_conn
+                )
+            elif action == 'delete':
+                await cAPI.delete_inventar(
+                    id_angajat=item['id_angajat'],
+                    id_item=item['id_item'],
+                    db_connection=db_conn
+                )
+
+        db_conn.close()
+
+        return jsonify({
+            "status": "OK"
+        })
+
 
     except Exception as e:
         print(e)

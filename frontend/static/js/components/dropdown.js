@@ -41,7 +41,7 @@ class Dropdown {
     let openDropdownHTML = `
         <div
         id="closedPart"
-        class="hidden absolute overflow-auto end-0 z-10 mt-2 w-56 lg:w-80 h-36 lg:h-48 rounded-md border border-gray-100 bg-white shadow-lg"
+        class="hidden absolute overflow-auto left-0 end-0 z-10 mt-2 w-56 lg:w-80 h-36 lg:h-48 rounded-md border border-gray-100 bg-white shadow-lg"
         role="menu"
       >
         <div id="elements" class="p-2">

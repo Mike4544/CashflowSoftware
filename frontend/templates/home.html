@@ -23,11 +23,15 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='dist/css/output.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/transition.css') }}"
+    />
     <title>Acasa | Helion Finance</title>
   </head>
   <body>
     <div id="app-grid" class="flex">
-      <aside id="sidenav" class="col-span-1 fixed top-0 bottom-0">
+      <aside id="sidenav" class="z-[999] col-span-1 fixed top-0 bottom-0">
         <!--    LG NAV  -->
         <div
           class="hidden lg:flex min-h-screen flex-col bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 justify-between border-e bg-white"
@@ -64,6 +68,15 @@
                   class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                 >
                   Salariati
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/inventar"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Inventar
                 </a>
               </li>
             </ul>
@@ -221,7 +234,47 @@
                       </span>
                     </a>
                   </li>
+
+                  <li>
+                  <a
+                    href="/inventar"
+                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-file-invoice"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        stroke="none"
+                        d="M0 0h24v24H0z"
+                        fill="none"
+                      ></path>
+                      <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                      <path
+                        d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      ></path>
+                      <path d="M9 7l1 0"></path>
+                      <path d="M9 13l6 0"></path>
+                      <path d="M13 17l2 0"></path>
+                    </svg>
+
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Inventar
+                    </span>
+                  </a>
+                </li>
                 </ul>
+
 
                 <div class="border-t py-4">
                   <a
@@ -263,12 +316,28 @@
       </aside>
       <div
         id="app-content"
-        class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56"
+        class="fade-in col-span-4 p-12 flex-col grow ml-12 lg:ml-56"
       >
         <div class="top-content h-12 mb-10">
           <div class="header-row flex mb-2">
             <div class="page-icon mr-4">
-              <img src="./res/icons/home-2.svg" alt="" />
+              <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon icon-tabler icon-tabler-home-2"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                      <path d="M10 12h4v4h-4z" />
+                    </svg>
             </div>
             <h1 class="page-header text-lg font-medium">Acasa</h1>
           </div>
@@ -833,5 +902,6 @@
       getData();
     </script>
     <script src="{{ url_for('static', filename='js/background.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pageTransition.js') }}"></script>
   </body>
 </html>

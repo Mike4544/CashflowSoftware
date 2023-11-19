@@ -20,7 +20,7 @@ class OperationsTable {
 
         //  Create the table element
         let div = document.createElement('div');
-        div.classList = `overflow-x-auto rounded-lg ${this.hasBorder ? "border border-gray-200" : ''}`;
+        div.classList = `rounded-lg ${this.hasBorder ? "border border-gray-200" : ''}`;
 
         let table = document.createElement('table');
         //  Add the tailwind classes
@@ -45,11 +45,11 @@ class OperationsTable {
          //  Create the body rows
          for(let entry in this.entries) {
             let tr = document.createElement('tr');
-            tr.className = 'h-14';
+            tr.classList = 'h-14 overflow-x-auto';
             //  Create the body cells
             for(let cell in this.entries[entry]) {
                 let td = document.createElement('td');
-                td.classList = "whitespace-nowrap px-4 py-2 text-gray-700";
+                td.classList = "whitespace-nowrap px-2 py-2 text-gray-700";
                 // Append the HTML element
                 try {
                     td.appendChild(this.entries[entry][cell]);
@@ -89,7 +89,7 @@ class OperationsTable {
         //  Create the body rows
         for(let entry in this.entries) {
             let tr = document.createElement('tr');
-            tr.className = 'h-14';
+            tr.classList = 'h-14';
             //  Create the body cells
             for(let cell in this.entries[entry]) {
                 let td = document.createElement('td');

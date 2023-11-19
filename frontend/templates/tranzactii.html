@@ -27,12 +27,16 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='dist/css/output.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/transition.css') }}"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tranzactii | Helion Finance</title>
   </head>
-  <body class="overflow-auto h-screen w-screen">
-    <div id="app-grid" class="flex">
-      <aside id="sidenav" class="col-span-1 h-screen fixed">
+  <body class="overflow-auto h-screen">
+    <div id="app-grid" class="fade-in flex">
+      <aside id="sidenav" class="z-[999] col-span-1 h-screen fixed">
         <!--    LG NAV  -->
         <div
           class="hidden lg:flex h-screen flex-col items-start justify-between border-e bg-white"
@@ -231,6 +235,45 @@
                       </span>
                     </a>
                   </li>
+
+                  <li>
+                    <a
+                      href="/inventar"
+                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="icon icon-tabler icon-tabler-file-invoice"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                        <path
+                          d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                        ></path>
+                        <path d="M9 7l1 0"></path>
+                        <path d="M9 13l6 0"></path>
+                        <path d="M13 17l2 0"></path>
+                      </svg>
+
+                      <span
+                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      >
+                        Inventar
+                      </span>
+                    </a>
+                  </li>
                 </ul>
 
                 <div class="border-t py-4">
@@ -274,7 +317,7 @@
 
       <div
         id="app-content"
-        class="col-span-4 p-12 flex-col grow ml-12 lg:ml-56"
+        class="overflow-auto col-span-4 p-12 flex-col grow shrink-0 ml-12 lg:ml-56"
       >
         <div class="top-content h-12 mb-10">
           <div class="header-row flex mb-2">
@@ -323,6 +366,19 @@
             <div id="selectLuna"></div>
 
             <div id="selectAn"></div>
+
+            <!-- Radio button for selecting Urgents or not-->
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="urgent"
+                id="urgent"
+                class="form-radio h-4 w-4 text-blue-600 rounded-md"
+              />
+              <label for="urgent" class="text-sm font-medium text-gray-700">
+                Urgente
+              </label>
+              </div>
           </div>
 
           <!--    SEARCH QUERY    -->
@@ -453,6 +509,7 @@
           luna: lunaInput.value === "" ? null : lunaInput.value,
           firma: searchBar.value === "" ? null : searchBar.value,
           an: anInput.value === "" ? null : anInput.value,
+          onlyUrgents: document.querySelector("#urgent").checked,
         };
 
         let dataSpan = document.querySelector("#titluLuna");
@@ -596,6 +653,7 @@
               lunaInput.value === ""
                 ? new Date().getMonth() + 1
                 : lunaInput.value;
+
             let currentYear =
               anInput.value === "" ? new Date().getFullYear() : anInput.value;
 
@@ -603,21 +661,44 @@
               //  Create a static table for the dropdown
               let staticTable = new StaticTable(["Firma", "Valori"], [], false);
 
+              let hasUrgent = jsonData[key]['hasUrgent'];
+
               let thisData = Object.keys(jsonData[key]["firma"]).map((firma) => {
                   //  console.log([firma, jsonData[key]["firma"][firma]]);
                   console.log("Firma: ", firma, typeof jsonData[key]['firma'][firma], jsonData[key]["firma"][firma]);
 
-                  let firmaEntries = jsonData[key]["firma"][firma];
+                  let firmaEntries = jsonData[key]["firma"][firma]['sume'];
+                  let isUrgent = jsonData[key]["firma"][firma]['isUrgent'];
                   let dateFirma = [];
 
                   for(let i = 0; i < firmaEntries.length; i++) {
                     let entry = firmaEntries[i];
                     console.log("entry", entry);
 
+                    // Make the element based on if it's urgent or not
+                    let nameElement = document.createElement("span");
+                    nameElement.innerHTML = firma;
+                    nameElement.classList.add("font-medium");
+
+                    if(isUrgent) {
+                      nameElement.classList.add("text-red-500");
+                    }
+
+                    let priceElement = document.createElement("span");
+                    priceElement.innerHTML = parseFloat(entry).toFixed(2);
+                    priceElement.classList.add("font-medium");
+
+                    if(isUrgent) {
+                      priceElement.classList.add("text-red-500");
+                    }
+
+                    console.log("nameElement", nameElement, "priceElement", priceElement)
+
+
                     dateFirma.push(...
                       [
-                        firma,
-                        entry,
+                        nameElement,
+                        priceElement,
                         //  Add a delete button
                         IconButton.create(null, "red-400", TRASH_ICON, (e) => {
                           //  console.log(e);
@@ -686,15 +767,20 @@
                       ]
                       );
                   }
-                  
-                  //  Parse the price
-                  dateFirma[1] = parseFloat(dateFirma[1]).toFixed(2);
 
                   console.log("Date firma", dateFirma);
                   return [...[...dateFirma]];
                 });
 
               console.log("This data", thisData);
+
+              let sumaElement = document.createElement("span");
+              sumaElement.innerHTML = parseFloat(jsonData[key]["suma"]).toFixed(2);
+              sumaElement.classList.add("font-medium");
+
+              if(hasUrgent) {
+                sumaElement.classList.add("text-red-500");
+              }
 
               staticTable.update(
                 // Give the whole matrix
@@ -707,10 +793,17 @@
                 false
               );
 
+              let UrgentIcon = document.createElement("div");
+              UrgentIcon.classList = "has-tooltip text-red-500 rounded-xl p-2 bg-red-100 mr-2 inline-block";
+              UrgentIcon.title = "Urgent";
+
+              UrgentIcon.innerHTML = URGENT_ICON;
+
               updatedData.push([
                 `${jsonData[key]["zi"]}-${jsonData[key]["luna"]}-${jsonData[key]["an"]}`,
                 dropdown.htmlElement,
-                parseFloat(jsonData[key]["suma"]).toFixed(2),
+                sumaElement,
+                hasUrgent ? UrgentIcon : null,
               ]);
             };
 
@@ -766,6 +859,7 @@
           luna: null,
           firma: null,
           an: null,
+          onlyUrgents: document.querySelector("#urgent").checked,
         }
       ) {
         Promise.all([
@@ -801,8 +895,17 @@
             let updatedData = [];
 
             for (let day = 0; day < data[0].length; day++) {
-              let _intrare = data[0][day][2] === "-" ? 0 : data[0][day][2];
-              let _iesire = data[1][day][2] === "-" ? 0 : data[1][day][2];
+
+              let _intrare = data[0][day][2].innerHTML == "-" ? 0 : data[0][day][2].innerHTML;
+              let _iesire = data[1][day][2].innerHTML == "-" ? 0 : data[1][day][2].innerHTML;
+
+              if(_intrare === undefined) {
+                _intrare = 0;
+              }
+
+              if(_iesire === undefined) {
+                _iesire = 0;
+              }
 
               let dayTotal = _intrare - _iesire;
 
@@ -833,5 +936,6 @@
       getQueriesData();
     </script>
     <script src="{{ url_for('static', filename='js/background.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pageTransition.js') }}"></script>
   </body>
 </html>

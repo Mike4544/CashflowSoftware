@@ -1,0 +1,25 @@
+.fade-in {
+    animation: fadeIn ease 250ms forwards;
+    -webkit-animation: fadeIn ease 250ms forwards;
+    -moz-animation: fadeIn ease 250ms forwards;
+    -o-animation: fadeIn ease 250ms forwards;
+    -ms-animation: fadeIn ease 250ms forwards;
+}
+
+.fade-out {
+    animation: fadeOut ease 100ms forwards;
+    -webkit-animation: fadeOut ease 100ms forwards;
+    -moz-animation: fadeOut ease 100ms forwards;
+    -o-animation: fadeOut ease 100ms forwards;
+    -ms-animation: fadeOut ease 100ms forwards;
+}
+
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@keyframes fadeOut {
+    0% {opacity:1;}
+    100% {opacity:0;}
+}
