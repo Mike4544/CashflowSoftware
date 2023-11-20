@@ -137,9 +137,6 @@ async def upload():
         },
         {
             "name": "Optiunea 4",
-        },
-        {
-            "name": "PLEBEA"
         }
     ]
 
