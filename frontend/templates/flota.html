@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <title>Helion Finance</title>
+	    <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	    <!----css3---->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+		
+		
+		<!--google fonts -->
+	    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+	
+	
+	   <!--google material icon-->
+      <link href="https://fonts.googleapis.com/css2?family=Material+Icons"rel="stylesheet">	  
+
+
+	  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+
+  </head>
+  <body>
+  
+
+
+<div class="wrapper">
+     
+	  <div class="body-overlay"></div>
+	 
+	 <!-------sidebar--design------------>
+	 
+	 <div id="sidebar">
+	    <div class="sidebar-header">
+		   <img src="img/new_logo.png" class="img-fluid"/>
+		</div>
+		<ul class="list-unstyled component m-0">
+
+		  <li class="">
+			<a href="#" class=""><i class="material-icons">home</i>Acasa </a>
+			</li>
+			<li class="">
+			<a href="#" class=""><i class="material-icons">attach_money</i>Tranzactii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">assignment_ind</i>Salarii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">store</i>Inventar </a>
+			</li>
+
+			<li class="">
+				<a href="./index.html" class="dashboard"><i class="material-icons">people</i>Angajati </a>
+			</li>
+			<li class="active">
+				<a href="./flota.html" class=""><i class="material-icons">toys</i>Flota </a>
+			</li>
+            <li class="">
+				<a href="./charts.html" class=""><i class="material-icons">insert_chart</i>Grafice </a>
+			</li>
+			
+
+			<li class="">
+				<a href="#" class=""><i class="material-icons">library_books</i>Incarca document </a>
+			</li>
+		
+		</ul>
+	 </div>
+	 
+   <!-------sidebar--design- close----------->
+   
+   
+   
+      <!-------page-content start----------->
+   
+      <div id="content">
+	     
+		  <!------top-navbar-start-----------> 
+		     
+		  <div class="top-navbar">
+		     <div class="xd-topbar">
+			     <div class="row">
+				     <div class="col-2 col-md-1 col-lg-1 order-2 order-md-1 align-self-center">
+					    <div class="xp-menubar">
+						    <span class="material-icons text-white">signal_cellular_alt</span>
+						</div>
+					 </div>
+				 </div>
+				 
+				 <div class="xp-breadcrumbbar text-center">
+				    <h4 class="page-title">Flota</h4>
+					<ol class="breadcrumb">
+					  <li class="breadcrumb-item"><a href="#">Vizualizare</a></li>
+					  <li class="breadcrumb-item active" aria-curent="page">Flota</li>
+					</ol>
+				 </div>
+				 
+				 
+			 </div>
+		  </div>
+		  <!------top-navbar-end-----------> 
+		  
+		  
+		   <!------main-content-start-----------> 
+		     
+		      <div class="main-content">
+			     <div class="row">
+				    <div class="col-md-12">
+					   <div class="table-wrapper">
+					     
+					   <div class="table-title">
+					     <div class="row">
+						     <div class="col-sm-6 p-3 flex justify-content-lg-start justify-content-center">
+							    <h2 class="ml-lg-2">Gestionare Flota</h2>
+							 </div>
+							 <div class="col-sm-6 p-3 flex justify-content-lg-end justify-content-center">
+							   <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal">
+							   <i class="material-icons">&#xE147;</i>
+							   <span>Adauga Vehicul</span>
+							   </a>
+							 </div>
+					     </div>
+					   </div>
+					   
+
+					   <table id="myTable" class="display" style="width:100%">
+						<thead>
+							<tr>
+								<th>Masina</th>
+								<th>Nr. Inmatriculare</th>
+								<th>GPS</th>
+								<th>Serie Sasiu</th>
+								<th>Combustibil</th>
+								<th>ITP</th>
+								<th>Zile ITP</th>
+								<th>RCA</th>
+								<th>Zile RCA</th>
+								<th>Rovinieta</th>
+								<th>Zile Rovinieta</th>
+                                <th>Copie Comforma</th>
+                                <th>Zile Comforma</th>
+                                <th>Sofer</th>
+                                <th>Editeaza</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for vehicul in vehicule %}
+							<tr entryID="{{ vehicul.ID }}">
+								<!-- <td>Mercedes</td>
+								<td>BH 10 AND</td>
+								<td>Arobs</td>
+								<td>AC12345678999</td>
+								<td>Motorina</td>
+								<td>10.10.2010</td>
+								<td>75 ZILE</td>
+								<td>10.10.2010</td>
+								<td>75 ZILE</td>
+                                <td>10.10.2010</td>
+								<td>75 ZILE</td>
+                                <td>10.10.2010</td>
+								<td>75 ZILE</td>
+								<td>Andrei Cosma</td>
+								<td>
+									<a href="#editEmployeeModal" class="edit" data-toggle="modal">
+										<i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+									</a>
+									<a href="#deleteEmployeeModal" class="delete" data-toggle="modal">
+										<i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+									</a>
+								</td> -->
+
+								<td>{{ vehicul.masina }}</td>
+								<td>{{ vehicul.nrInmatriculare }}</td>
+								<td>{{ vehicul.gps }}</td>
+								<td>{{ vehicul.serieSasiu }}</td>
+								<td>{{ vehicul.combustibil }}</td>
+								<td>{{ vehicul.itp }}</td>
+								<td>{{ vehicul.zileItp }}</td>
+								<td>{{ vehicul.rca }}</td>
+								<td>{{ vehicul.zileRca }}</td>
+								<td>{{ vehicul.rovinieta }}</td>
+								<td>{{ vehicul.zileRovinieta }}</td>
+								<td>{{ vehicul.copieConforma }}</td>
+								<td>{{ vehicul.zileConforma }}</td>
+								<td>{{ vehicul.sofer }}</td>
+
+								<td>
+									<a href="#editEmployeeModal" class="edit" data-toggle="modal" kType="flota">
+										<i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+									</a>
+									<a href="#deleteEmployeeModal" class="delete" data-toggle="modal" kType="flota">
+										<i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+									</a>
+								</td>
+
+							</tr>
+							{% endfor %}
+					
+							<!-- Repetă până la ultimul rând -->
+					
+						</tbody>
+					</table>
+					   
+					   
+					   </div>
+					</div>
+					
+					
+									   <!----add-modal start--------->
+<div class="modal fade" tabindex="-1" id="addEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Adauga Vehicul</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="masina">Masina</label>
+            <input id="masina" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="nrInmatriculare">Nr. Inmatriculare</label>
+            <input id="nrInmatriculare" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="gps">GPS</label>
+            <input id="gps" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="serieSasiu">Serie Sasiu</label>
+            <input id="serieSasiu" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="combustibil">Combustibil</label>
+            <input id="combustibil" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="itp">ITP</label>
+            <input id="itp" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="rca">RCA</label>
+            <input id="rca" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="rovinieta">Rovinieta</label>
+            <input id="rovinieta" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="copieComforma">Copie Comforma</label>
+            <input id="copieComforma" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="sofer">Sofer</label>
+			<input id="sofer" type="text" class="form-control" required>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" kType="flota">Adauga</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->
+					   
+					   
+					   
+					   
+					   
+				   <!----edit-modal start--------->
+		<div class="modal fade" tabindex="-1" id="editEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editeaza Angajat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="masina">Masina</label>
+            <input id="masina" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="nrInmatriculare">Nr. Inmatriculare</label>
+            <input id="nrInmatriculare" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="gps">GPS</label>
+            <input id="gps" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="serieSasiu">Serie Sasiu</label>
+            <input id="serieSasiu" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="combustibil">Combustibil</label>
+            <input id="combustibil" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="itp">ITP</label>
+            <input id="itp" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="rca">RCA</label>
+            <input id="rca" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="rovinieta">Rovinieta</label>
+            <input id="rovinieta" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="copieComforma">Copie Comforma</label>
+            <input id="copieComforma" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="sofer">Sofer</label>
+			<input id="sofer" type="text" class="form-control" required>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" ktype="flota">Savlveaza</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->	   
+					   
+					   
+					 <!----delete-modal start--------->
+		<div class="modal fade" tabindex="-1" id="deleteEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sterge Vehicul</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Sunteti sigur ca doriti sa stergeti ?</p>
+		<p class="text-warning"><small>aceasta actiune este ireversibila,</small></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" ktype="flota">Sterge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->   
+					   
+					
+					
+				 
+			     </div>
+			  </div>
+		  
+		    <!------main-content-end-----------> 
+		  
+		 
+		 
+		 <!----footer-design------------->
+		 
+		 <footer class="footer">
+		    <div class="container-fluid">
+			   <div class="footer-in">
+			      <p class="mb-0">Solutie dezvoltata de Helion Grup</p>
+			   </div>
+			</div>
+		 </footer>
+		 
+		 
+		 
+		 
+	  </div>
+   
+</div>
+
+
+
+<!-------complete html----------->
+
+
+
+
+
+  
+     <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+ 
+	<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+	<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  
+  
+   
+
+
+  </body>
+  
+  </html>
+
+

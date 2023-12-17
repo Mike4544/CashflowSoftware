@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <title>Helion Finance</title>
+	    <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	    <!----css3---->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+		
+		
+		
+		<!--google fonts -->
+	    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+	
+	
+	   <!--google material icon-->
+      <link href="https://fonts.googleapis.com/css2?family=Material+Icons"rel="stylesheet">	  
+
+
+	  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+      <style>
+        /* Stilurile personalizate pot rămâne aici */
+
+        .chart-container {
+        margin-top: 20px;
+        }
+
+        canvas {
+            width: 100% !important; /* Face canvas-ul să fie 100% lățime */
+            
+            height: auto; /* Face canvas-ul să fie responsive în înălțime */
+            max-height: 500px; /* Setează lățimea maximă pentru a evita extinderea excesivă */
+        }
+
+        .data-table {
+        margin-bottom: 50px;
+        }
+
+        #container_principal {
+          margin-top: 20px;
+        }
+
+
+
+      </style>
+
+
+  </head>
+  <body>
+  
+
+
+<div class="wrapper">
+     
+	  <div class="body-overlay"></div>
+	 
+	 <!-------sidebar--design------------>
+	 
+	 <div id="sidebar">
+	    <div class="sidebar-header">
+		   <img src="img/new_logo.png" class="img-fluid"/>
+		</div>
+		<ul class="list-unstyled component m-0">
+
+		  <li class="">
+			<a href="#" class=""><i class="material-icons">home</i>Acasa </a>
+			</li>
+			<li class="">
+			<a href="#" class=""><i class="material-icons">attach_money</i>Tranzactii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">assignment_ind</i>Salarii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">store</i>Inventar </a>
+			</li>
+
+			<li class="">
+				<a href="./index.html" class="dashboard"><i class="material-icons">people</i>Angajati </a>
+			</li>
+			<li class="">
+				<a href="./flota.html" class=""><i class="material-icons">toys</i>Flota </a>
+			</li>
+            <li class="active">
+				<a href="./charts.html" class=""><i class="material-icons">insert_chart</i>Grafice </a>
+			</li>
+			
+
+			<li class="">
+				<a href="#" class=""><i class="material-icons">library_books</i>Incarca document </a>
+			</li>
+		
+		</ul>
+	 </div>
+	 
+   <!-------sidebar--design- close----------->
+   
+   
+   
+      <!-------page-content start----------->
+   
+      <div id="content">
+	     
+		  <!------top-navbar-start-----------> 
+		     
+		  <div class="top-navbar">
+		     <div class="xd-topbar">
+			     <div class="row">
+				     <div class="col-2 col-md-1 col-lg-1 order-2 order-md-1 align-self-center">
+					    <div class="xp-menubar">
+						    <span class="material-icons text-white">signal_cellular_alt</span>
+						</div>
+					 </div>
+				 </div>
+				 
+				 <div class="xp-breadcrumbbar text-center">
+				    <h4 class="page-title">Grafice</h4>
+					<ol class="breadcrumb">
+					  <li class="breadcrumb-item"><a href="#">Vizualizare</a></li>
+					  <li class="breadcrumb-item active" aria-curent="page">Grafice</li>
+					</ol>
+				 </div>
+				 
+				 
+			 </div>
+		  </div>
+		  <!------top-navbar-end-----------> 
+		  
+		  
+		   <!------main-content-start-----------> 
+           <div class="main-content">
+           <!-- <div class="container-fluid"> -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="table-wrapper">
+                  <div class="table-title">
+                    <div class="row">
+                      <div class="col-sm-6 p-3 d-flex justify-content-lg-start justify-content-center">
+                        <h2 class="ml-lg-2">Vizualizare Grafice</h2>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="container-fluid" id = "container_principal">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="chartType">Selectează tipul de grafic:</label>
+                          <select class="form-control" id="chartType">
+                            <option value="bar">Bar Chart</option>
+                            <option value="line">Line Chart</option>
+                            <option value="radar">Radar Chart</option>
+                            <option value="pie">Pie Chart</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <button onclick="addChart()" class="btn btn-primary">Adaugă Grafic</button>
+                      </div>
+                    </div>
+                  
+                    <div id="chart-container" class="row">
+                      <!-- Aici vor fi adăugate dinamic graficele -->
+                    </div>
+                  </div>
+
+
+
+
+                </div>
+              </div>
+            </div>
+          <!-- </div> -->
+        </div>
+		  
+		    <!------main-content-end-----------> 
+		  
+		 
+		 
+		 <!----footer-design------------->
+		 
+		 <footer class="footer">
+		    <div class="container-fluid">
+			   <div class="footer-in">
+			      <p class="mb-0">Solutie dezvoltata de Helion Grup</p>
+			   </div>
+			</div>
+		 </footer>
+		 
+		 
+		 
+		 
+	  </div>
+   
+</div>
+
+
+
+<!-------complete html----------->
+
+
+
+
+
+  
+     <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+ 
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="{{ url_for('static', filename='js/chartsScript.js') }}"></script>
+   
+   
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+   
+   <script>
+
+    let tempCharts = {{ charts | tojson | safe }};
+  
+    tempCharts.forEach(chart => {
+      console.log(chart);
+      loadChart(chart);
+    });
+
+    </script>
+
+
+
+
+  </body>
+  
+  </html>
+
+

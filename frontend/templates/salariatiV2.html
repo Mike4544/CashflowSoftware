@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+        <title>Helion Finance</title>
+	    <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+	    <!----css3---->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+		
+		
+		<!--google fonts -->
+	    <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+	
+	
+	   <!--google material icon-->
+      <link href="https://fonts.googleapis.com/css2?family=Material+Icons"rel="stylesheet">	  
+
+
+	  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+
+
+  </head>
+  <body>
+  
+
+
+<div class="wrapper">
+     
+	  <div class="body-overlay"></div>
+	 
+	 <!-------sidebar--design------------>
+	 
+	 <div id="sidebar">
+	    <div class="sidebar-header">
+		   <img src="img/new_logo.png" class="img-fluid"/>
+		</div>
+		<ul class="list-unstyled component m-0">
+
+		  <li class="">
+			<a href="#" class=""><i class="material-icons">home</i>Acasa </a>
+			</li>
+			<li class="">
+			<a href="#" class=""><i class="material-icons">attach_money</i>Tranzactii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">assignment_ind</i>Salarii </a>
+			</li>
+			<li class="">
+				<a href="#" class=""><i class="material-icons">store</i>Inventar </a>
+			</li>
+
+			<li class="active">
+				<a href="./index.html" class="dashboard"><i class="material-icons">people</i>Angajati </a>
+			</li>
+			<li class="">
+				<a href="./flota.html" class=""><i class="material-icons">toys</i>Flota </a>
+			</li>
+			<li class="">
+				<a href="./charts.html" class=""><i class="material-icons">insert_chart</i>Grafice </a>
+			</li>
+			
+
+			<li class="">
+				<a href="#" class=""><i class="material-icons">library_books</i>Incarca document </a>
+			</li>
+		
+		</ul>
+	 </div>
+	 
+   <!-------sidebar--design- close----------->
+   
+   
+   
+      <!-------page-content start----------->
+   
+      <div id="content">
+	     
+		  <!------top-navbar-start-----------> 
+		     
+		  <div class="top-navbar">
+		     <div class="xd-topbar">
+			     <div class="row">
+				     <div class="col-2 col-md-1 col-lg-1 order-2 order-md-1 align-self-center">
+					    <div class="xp-menubar">
+						    <span class="material-icons text-white">signal_cellular_alt</span>
+						</div>
+					 </div>
+				 </div>
+				 
+				 <div class="xp-breadcrumbbar text-center">
+				    <h4 class="page-title">Angajati</h4>
+					<ol class="breadcrumb">
+					  <li class="breadcrumb-item"><a href="#">Vizualizare</a></li>
+					  <li class="breadcrumb-item active" aria-curent="page">Angajati</li>
+					</ol>
+				 </div>
+				 
+				 
+			 </div>
+		  </div>
+		  <!------top-navbar-end-----------> 
+		  
+		  
+		   <!------main-content-start-----------> 
+		     
+		      <div class="main-content">
+			     <div class="row">
+				    <div class="col-md-12">
+					   <div class="table-wrapper">
+					     
+					   <div class="table-title">
+					     <div class="row">
+						     <div class="col-sm-6 p-3 flex justify-content-lg-start justify-content-center">
+							    <h2 class="ml-lg-2">Gestionare Angajati</h2>
+							 </div>
+							 <div class="col-sm-6 p-3 flex justify-content-lg-end justify-content-center">
+							   <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal">
+							   <i class="material-icons">&#xE147;</i>
+							   <span>Adauga Angajat</span>
+							   </a>
+							 </div>
+					     </div>
+					   </div>
+					   
+
+					   <table id="myTable" class="display" style="width:100%">
+						<thead>
+							<tr>
+								<th>Nume</th>
+								<th>Firma</th>
+								<th>Nr.CTR/Data</th>
+								<th>Functia</th>
+								<th>CNP</th>
+								<th>CI</th>
+								<th>Valabilitate</th>
+								<th>Fisa Aptitudini</th>
+								<th>Nr. Telefon</th>
+								<th>IBAN</th>
+								<th>Editeaza</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for angajat in angajati %}
+							<tr entryID="{{ angajat.ID }}">
+								<!-- <td>Andrei Cosma</td>
+								<td>Helion Security SRL</td>
+								<td>123/20.10.2022</td>
+								<td>Director Regional</td>
+								<td>123456789</td>
+								<td>CJ 123456</td>
+								<td>12.12.2023</td>
+								<td>10.10.2010</td>
+								<td>0720148720</td>
+								<td>RO1234567890</td>
+								<td>
+									<a href="#editEmployeeModal" class="edit" data-toggle="modal">
+										<i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+									</a>
+									<a href="#deleteEmployeeModal" class="delete" data-toggle="modal">
+										<i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+									</a>
+								</td> -->
+
+								
+
+								<td><a href="/salariat/{{ angajat.ID }}">{{ angajat.nume }}</a></td>
+								<td>{{ angajat.firma }}</td>
+								<td>{{ angajat.nrCtr }}</td>
+								<td>{{ angajat.functia }}</td>
+								<td>{{ angajat.cnp }}</td>
+								<td>{{ angajat.ci }}</td>
+								<td>{{ angajat.valabilitate }}</td>
+								<td>{{ angajat.fisaAptitudini }}</td>
+								<td>{{ angajat.nrTelefon }}</td>
+								<td>{{ angajat.iban }}</td>
+
+								<td>
+									<a href="#editEmployeeModal" class="edit" data-toggle="modal" kType="angajat">
+										<i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+									</a>
+									<a href="#deleteEmployeeModal" class="delete" data-toggle="modal" kType="angajat">
+										<i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+									</a>
+								</td>
+
+							</tr>
+							{% endfor %}
+					
+						</tbody>
+					</table>
+					   
+					   
+					   </div>
+					</div>
+					
+					
+									   <!----add-modal start--------->
+		<div class="modal fade" tabindex="-1" id="addEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Adauga Angajat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="nume">Nume</label>
+            <input id="nume" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="firma">Firma</label>
+            <input id="firma" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="nrCtr">Nr.CTR/Data</label>
+            <input id="nrCtr" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="functie">Functia</label>
+            <input id="functie" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="cnp">CNP</label>
+            <input id="cnp" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="ci">CI</label>
+            <input id="ci" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="valabilitate">Valabilitate</label>
+            <input id="valabilitate" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="fisaAptitudini">Fisa Aptitudini</label>
+            <input id="fisaAptitudini" type="date" class="form-control" required>
+        </div>
+		<div class="form-group">
+			<label for="telefon">Nr. Telefon</label>
+			<input id="telefon" type="text" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="iban">IBAN</label>
+			<input id="iban" type="text" class="form-control" required>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" kType="angajat">Adauga</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->
+					   
+					   
+					   
+					   
+					   
+				   <!----edit-modal start--------->
+		<div class="modal fade" tabindex="-1" id="editEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editeaza Angajat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="nume">Nume</label>
+            <input id="nume" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="firma">Firma</label>
+            <input id="firma" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="nrCtr">Nr.CTR/Data</label>
+            <input id="nrCtr" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="functie">Functia</label>
+            <input id="functie" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="cnp">CNP</label>
+            <input id="cnp" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="ci">CI</label>
+            <input id="ci" type="text" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="valabilitate">Valabilitate</label>
+            <input id="valabilitate" type="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="fisaAptitudini">Fisa Aptitudini</label>
+            <input id="fisaAptitudini" type="date" class="form-control" required>
+        </div>
+		<div class="form-group">
+			<label for="telefon">Nr. Telefon</label>
+			<input id="telefon" type="text" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="iban">IBAN</label>
+			<input id="iban" type="text" class="form-control" required>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" kType="salariat">Savlveaza</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->	   
+					   
+					   
+					 <!----delete-modal start--------->
+		<div class="modal fade" tabindex="-1" id="deleteEmployeeModal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sterge Angajat</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Sunteti sigur ca doriti sa stergeti ?</p>
+		<p class="text-warning"><small>aceasta actiune este ireversibila,</small></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuleaza</button>
+        <button type="button" class="btn btn-success" ktype="salariat">Sterge</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+					   <!----edit-modal end--------->   
+					   
+					
+					
+				 
+			     </div>
+			  </div>
+		  
+		    <!------main-content-end-----------> 
+		  
+		 
+		 
+		 <!----footer-design------------->
+		 
+		 <footer class="footer">
+		    <div class="container-fluid">
+			   <div class="footer-in">
+			      <p class="mb-0">Solutie dezvoltata de Helion Grup</p>
+			   </div>
+			</div>
+		 </footer>
+		 
+		 
+		 
+		 
+	  </div>
+   
+</div>
+
+
+<!-------complete html----------->
+
+
+
+
+
+  
+     <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+   <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+   <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  
+
+
+
+
+  </body>
+  
+  </html>
+
+

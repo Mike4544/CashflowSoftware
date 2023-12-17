@@ -4,14 +4,17 @@ from backend.flask_api import (
     __get_angajati,
     __get_angajat,
     __get_salariu,
-    __get_inventar
+    __get_inventar,
+    __get_flota
 )
+import backend.chartsAPI as chartsAPI
 from backend.authAPI import auth_api
 from datetime import datetime
 
 app = Quart(__name__, static_folder="frontend/static", template_folder="frontend/templates")
 app.register_blueprint(api_routes)
 app.register_blueprint(auth_api)
+app.register_blueprint(chartsAPI.charts_api)
 
 
 @app.route('/')
@@ -58,8 +61,8 @@ async def salariati():
     # Get salariati from the server
     salariati = await __get_angajati()
     return await render_template(
-        'salariati.html',
-        salariati=salariati
+        'salariatiV2.html',
+        angajati=salariati
     )
 
 
@@ -102,7 +105,7 @@ async def inventar():
 
     return await render_template(
         'inventar.html',
-        salariati=angajati
+        angajati=angajati
     )
 
 @app.route('/inventar/<int:id>')
@@ -122,6 +125,21 @@ async def inventar_angajat(id):
             companie=angajat['firma'],
             inventar=inventar
         )
+
+@app.route('/flota/')
+async def flota():
+    masini = await __get_flota()
+    return await render_template(
+        'flota.html',
+        vehicule=masini
+    )
+
+@app.route("/grafice/")
+async def grafice():
+    return await render_template(
+        'charts.html',
+        charts=chartsAPI.__load_charts()
+    )
 
 @app.route('/upload')
 async def upload():

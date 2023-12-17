@@ -1,3 +1,5 @@
+import datetime
+
 from quart import Quart, request, jsonify, Blueprint
 import asyncio
 
@@ -194,8 +196,16 @@ async def __get_angajati():
     data = [{
         "ID": ID,
         "nume": nume,
-        "firma": firma
-    } for ID, nume, firma in raw_data]
+        "firma": firma,
+        "nrCtr": nrCtr,
+        "functia": functia,
+        "cnp": cnp,
+        "ci": ci,
+        "valabilitate": valabilitate,
+        "fisaAptitudini": fisaAptitudini,
+        "nrTelefon": nrTelefon,
+        "iban": iban
+    } for ID, nume, firma, nrCtr, functia, cnp, ci, valabilitate, fisaAptitudini, nrTelefon, iban in raw_data]
 
     return data
 
@@ -315,6 +325,61 @@ async def __get_inventar(angajat):
 
     return data
 
+@api_routes.route('/api/cashflow/get/flota', methods=['GET'])
+async def get_flota():
+    raw_data = await cAPI.get_flota()
+
+    data = [{
+        "ID": ID,
+        "masina": masina,
+        "nrInmatriculare": nrInmatriculare,
+        "gps": gps,
+        "serieSasiu": serieSasiu,
+        "combustibil": combustibil,
+        "itp": itp,
+        "zileItp": datetime.datetime.strptime(itp, "%Y-%m-%d") - datetime.datetime.now(),
+        "rca": rca,
+        "zileRca": datetime.datetime.now() - datetime.datetime.now(),
+        "rovinieta": rovinieta,
+        "zileRovinieta": datetime.datetime.strptime(rovinieta, "%Y-%m-%d") - datetime.datetime.now(),
+        "copieConforma": copieConforma,
+        "zileConforma": datetime.datetime.strptime(copieConforma, "%Y-%m-%d") - datetime.datetime.now(),
+        "sofer": sofer
+    } for ID, masina, nrInmatriculare, gps, serieSasiu, combustibil, itp, zileItp, rca, zileRca, rovinieta, zileRovinieta, copieConforma, zileConforma, sofer in raw_data]
+
+    return jsonify(data)
+
+async def __get_flota():
+    raw_data = await cAPI.get_flota()
+
+
+    def ____get_translated_timedelta(
+            date1: datetime.datetime,
+            date2: datetime.datetime
+    ):
+        delta = date1 - date2
+        return f'{delta.days} {abs(delta.days) != 1 and "zile" or "zi" }'
+
+    data = [{
+        "ID": ID,
+        "masina": masina,
+        "nrInmatriculare": nrInmatriculare,
+        "gps": gps,
+        "serieSasiu": serieSasiu,
+        "combustibil": combustibil,
+        "itp": itp,
+        "zileItp": ____get_translated_timedelta(datetime.datetime.strptime(itp, "%Y-%m-%d"), datetime.datetime.now()),
+        "rca": rca,
+        "zileRca": ____get_translated_timedelta(datetime.datetime.strptime(rca, "%Y-%m-%d"), datetime.datetime.now()),
+        "rovinieta": rovinieta,
+        "zileRovinieta": ____get_translated_timedelta(datetime.datetime.strptime(rovinieta, "%Y-%m-%d"), datetime.datetime.now()),
+        "copieConforma": copieConforma,
+        "zileConforma": ____get_translated_timedelta(datetime.datetime.strptime(copieConforma, "%Y-%m-%d"), datetime.datetime.now()),
+        "sofer": sofer
+    } for ID, masina, nrInmatriculare, gps, serieSasiu, combustibil, itp, rca, rovinieta, copieConforma, sofer in raw_data]
+
+    return data
+
 
 #   =================================================================
 #   =================================================================
@@ -393,7 +458,15 @@ async def add_angajat():
     try:
         angajat = await cAPI.insert_angajat(
             nume=json_data['nume'],
-            companii=[json_data['firma']]
+            companii=[json_data['firma']],
+            nrCtr=json_data['nrCtr'],
+            functie=json_data['functie'],
+            cnp=json_data['cnp'],
+            ci=json_data['ci'],
+            valabilitate=json_data['valabilitate'],
+            fisaAptitudini=json_data['fisaAptitudini'],
+            telefon=json_data['telefon'],
+            iban=json_data['iban']
         )
 
         print(angajat)
@@ -403,7 +476,15 @@ async def add_angajat():
             "data": {
                 "ID": angajat[1],
                 "nume": json_data['nume'],
-                "firma": json_data['firma']
+                "firma": json_data['firma'],
+                "nrCtr": json_data['nrCtr'],
+                "functie": json_data['functie'],
+                "cnp": json_data['cnp'],
+                "ci": json_data['ci'],
+                "valabilitate": json_data['valabilitate'],
+                "fisaAptitudini": json_data['fisaAptitudini'],
+                "telefon": json_data['telefon'],
+                "iban": json_data['iban']
             }
         })
     except Exception as e:
@@ -564,7 +645,40 @@ async def add_inventar():
             "status": "Error"
         })
 
+@api_routes.route('/api/cashflow/add/flota', methods=['POST'])
+async def add_flota():
+    json_data = await request.get_json()
+    print(json_data)
 
+    try:
+
+        entry = await cAPI.insert_flota(
+            masina=json_data['masina'],
+            nrInmatriculare=json_data['nrInmatriculare'],
+            gps=json_data['gps'],
+            serieSasiu=json_data['serieSasiu'],
+            combustibil=json_data['combustibil'],
+            itp=json_data['itp'],
+            rca=json_data['rca'],
+            rovinieta=json_data['rovinieta'],
+            copieConforma=json_data['copieComforma'],
+            sofer=json_data['sofer']
+        )
+
+        print(entry)
+
+        return jsonify({
+            "status": "OK",
+            "data": {
+                "ID": entry[1],
+                **json_data
+            }
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
 #   =================================================================
 #   =================================================================
 
@@ -599,8 +713,18 @@ async def update_angajat():
     try:
         await cAPI.update_angajat(
             id=json_data['id'],
-            nume=json_data['nume'],
-            companie=json_data['firma']
+            data= {
+                "Nume": json_data['nume'],
+                "Companie": json_data['firma'],
+                "NrCTR": json_data['nrCtr'],
+                "Functie": json_data['functie'],
+                "CNP": json_data['cnp'],
+                "CI": json_data['ci'],
+                "Valabilitate": json_data['valabilitate'],
+                "FisaAptitudini": json_data['fisaAptitudini'],
+                "Telefon": json_data['telefon'],
+                "IBAN": json_data['iban']
+            }
         )
 
         return jsonify({
@@ -638,6 +762,37 @@ async def update_salariu():
                 valoare=salariu['salariu'],
                 bonus=salariu['bonus']
             )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/update/flota', methods=['POST'])
+async def update_flota():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.update_flota(
+            id=json_data['id'],
+            data= {
+                "Masina": json_data['masina'],
+                "NrInmatriculare": json_data['nrInmatriculare'],
+                "GPS": json_data['gps'],
+                "SerieSasiu": json_data['serieSasiu'],
+                "Combustibil": json_data['combustibil'],
+                "ITP": json_data['itp'],
+                "RCA": json_data['rca'],
+                "Rovinieta": json_data['rovinieta'],
+                "CopieConforma": json_data['copieComforma'],
+                "Sofer": json_data['sofer']
+            }
+        )
 
         return jsonify({
             "status": "OK"
@@ -721,6 +876,25 @@ async def delete_angajat():
 
     try:
         await cAPI.delete_angajat(
+            id=json_data['id']
+        )
+
+        return jsonify({
+            "status": "OK"
+        })
+    except Exception as e:
+        print(e)
+        return jsonify({
+            "status": "Error"
+        })
+
+@api_routes.route('/api/cashflow/delete/flota', methods=['POST'])
+async def delete_flota():
+    json_data = await request.get_json()
+    print(json_data)
+
+    try:
+        await cAPI.delete_flota(
             id=json_data['id']
         )
 

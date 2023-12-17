@@ -9,13 +9,13 @@ async def main():
 
     await cAPI.insert_angajat_many(
         [
-            ('Marian Popescu', ['CAPY SRL.']),
-            ('Ion Popescu', ['CAPY SRL.']),
-            ('Marian Ion', ['CAPY SRL.']),
-            ('Ion Marian', ['CAPY SRL.']),
-            ('Marian Marian', ['CAPY SRL.']),
-            ('Ion Ion', ['CAPY SRL.']),
-            ('Popescu Popescu', ['CAPY SRL.']),
+            ('Marian Popescu', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Ion Popescu', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Marian Ion', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Ion Marian', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Marian Marian', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Ion Ion', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
+            ('Popescu Popescu', ['CAPY SRL.'], "123/20.10.2022", "Director Regional", "123456789", "CJ 123456", "12.12.2023", "10.10.2010", "0752123123", "RO123456789"),
         ]
     )
 

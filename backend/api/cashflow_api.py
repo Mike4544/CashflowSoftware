@@ -128,8 +128,15 @@ async def create_cashflow_table() -> bool:
                 CREATE TABLE IF NOT EXISTS Salariati (
                     ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     Nume VARCHAR(255),
-                    Companie VARCHAR(255)
-                    
+                    Companie VARCHAR(255),
+                    NrCTR VARCHAR(255),
+                    Functie VARCHAR(255),
+                    CNP VARCHAR(255),
+                    CI VARCHAR(255),
+                    Valabilitate VARCHAR(255),
+                    FisaAptitudini VARCHAR(255),
+                    Telefon VARCHAR(255),
+                    IBAN VARCHAR(255)
                 );
                 """
             )
@@ -156,6 +163,24 @@ async def create_cashflow_table() -> bool:
                     Cantitate INTEGER DEFAULT 0,
                     Valoare DECIMAL(10, 2) DEFAULT 0,
                     IdAngajat INTEGER
+                );
+                """
+            )
+
+            db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS Flota (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    Masina VARCHAR(255),
+                    NrInmatriculare VARCHAR(255),
+                    GPS VARCHAR(255),
+                    SerieSasiu VARCHAR(255),
+                    Combustibil VARCHAR(255),
+                    ITP VARCHAR(255),
+                    RCA VARCHAR(255),
+                    Rovinieta VARCHAR(255),
+                    CopieConforma VARCHAR(255),
+                    Sofer VARCHAR(255)
                 );
                 """
             )
@@ -452,15 +477,23 @@ async def insert_cont_bancar(
 async def insert_angajat(
         nume: str,
         companii: list[str],
+        nrCtr: str,
+        functie: str,
+        cnp: str,
+        ci: str,
+        valabilitate: str,
+        fisaAptitudini: str,
+        telefon: str,
+        iban: str,
         db_connection: Database = None
 ):
     
     table = Table("Salariati")
     
-    query = Query.into(table).columns("Nume", "Companie")
+    query = Query.into(table).columns("Nume", "Companie", "NrCTR", "Functie", "CNP", "CI", "Valabilitate", "FisaAptitudini", "Telefon", "IBAN")
     for companie in companii:
         query = query.insert(
-            nume, companie
+            nume, companie, nrCtr, functie, cnp, ci, valabilitate, fisaAptitudini, telefon, iban
         )
 
         # For every employee, insert a salary for every company
@@ -491,7 +524,7 @@ async def insert_angajat(
 async def insert_angajat_many(
         angajati: list[
             tuple[
-                str, list[str]
+                str, list[str], str, str, str, str, str, str, str, str
                 ]
             ],
         db_connection: Database = None
@@ -640,6 +673,40 @@ async def insert_salariu_many(
     except Exception as e:
         print(e)
         return False
+
+
+async def insert_flota(
+        masina: str,
+        nrInmatriculare: str,
+        gps: str,
+        serieSasiu: str,
+        combustibil: str,
+        itp: str,
+        rca: str,
+        rovinieta: str,
+        copieConforma: str,
+        sofer: str,
+        db_connection: Database = None
+):
+
+        table = Table("Flota")
+
+        query = Query.into(table).columns(
+            "Masina", "NrInmatriculare", "GPS", "SerieSasiu", "Combustibil", "ITP", "RCA", "Rovinieta", "CopieConforma", "Sofer"
+        ).insert(
+            masina, nrInmatriculare, gps, serieSasiu, combustibil, itp, rca, rovinieta, copieConforma, sofer
+        )
+
+        try:
+            if db_connection:
+                return await db_connection.query_async(query.get_sql()), db_connection.lastrowid()
+
+            with Database(DB_PATH) as db:
+                return await db.query_async(query.get_sql()), db.lastrowid()
+
+        except Exception as e:
+            print(e)
+            return []
 
 
 #   =================================================================
@@ -1003,6 +1070,21 @@ async def get_inventar(
         print(e)
         return []
 
+async def get_flota(
+        db_connection: Database = None
+):
+
+        db = db_connection or Database(DB_PATH)
+
+        table = Table("Flota")
+        query = Query.from_(table).select('*')
+
+        try:
+            return await db.query_async(query.get_sql())
+        except Exception as e:
+            print(e)
+            return []
+
 
 #   =================================================================
 #   =================================================================
@@ -1133,29 +1215,32 @@ async def update_cont_bancar(
 
 async def update_angajat(
         id: int,
-        nume: str,
-        companie: str,
+        data: dict[str, str, str, str, str, str, str, str, str],
         db_connection: Database = None
 ) -> list[tuple]:
 
         try:
             if db_connection:
-                query = Query.update('Salariati')\
-                    .set('Nume', nume)\
-                    .set('Companie', companie)\
-                    .where(
-                        Field('ID') == id
-                    )
+                query = Query.update('Salariati')
+
+                for name, value in data.items():
+                    query = query.set(name, value)
+
+                query = query.where(
+                    Field('ID') == id
+                )
 
                 return await db_connection.query_async(query.get_sql())
 
             with Database(DB_PATH) as db:
-                query = Query.update('Salariati')\
-                    .set('Nume', nume)\
-                    .set('Companie', companie)\
-                    .where(
-                        Field('ID') == id
-                    )
+                query = Query.update('Salariati')
+
+                for name, value in data.items():
+                    query = query.set(name, value)
+
+                query = query.where(
+                    Field('ID') == id
+                )
 
                 return await db.query_async(query.get_sql())
 
@@ -1234,6 +1319,41 @@ async def update_inventar(
     except Exception as e:
         print(e)
         return []
+
+async def update_flota(
+        id: int,
+        data: dict,
+        db_connection: Database = None
+):
+
+            try:
+                if db_connection:
+                    query = Query.update('Flota')
+
+                    for name, value in data.items():
+                        query = query.set(name, value)
+
+                    query = query.where(
+                        Field('ID') == id
+                    )
+
+                    return await db_connection.query_async(query.get_sql())
+
+                with Database(DB_PATH) as db:
+                    query = Query.update('Flota')
+
+                    for name, value in data.items():
+                        query = query.set(name, value)
+
+                    query = query.where(
+                        Field('ID') == id
+                    )
+
+                    return await db.query_async(query.get_sql())
+
+            except Exception as e:
+                print(e)
+                return []
 
 
 #   Delete operations
@@ -1387,6 +1507,31 @@ async def delete_inventar(
         with Database(DB_PATH) as db:
             query = Query.from_('Inventar').where(
                 (Field('ID') == id_item) & (Field('IdAngajat') == id_angajat)
+            ).delete()
+
+            return await db.query_async(query.get_sql())
+
+    except Exception as e:
+        print(e)
+        return []
+
+
+async def delete_flota(
+        id: int,
+        db_connection: Database = None
+):
+
+    try:
+        if db_connection:
+            query = Query.from_('Flota').where(
+                Field('ID') == id
+            ).delete()
+
+            return await db_connection.query_async(query.get_sql())
+
+        with Database(DB_PATH) as db:
+            query = Query.from_('Flota').where(
+                Field('ID') == id_masina
             ).delete()
 
             return await db.query_async(query.get_sql())
