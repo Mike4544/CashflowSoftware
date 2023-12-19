@@ -36,15 +36,10 @@
   </head>
   <body class="overflow-auto h-screen">
     <div id="app-grid" class="fade-in flex">
-      <aside id="sidenav" class="z-[999] col-span-1 h-screen fixed">
+      <aside id="sidenav" class="z-[999] col-span-1 fixed top-0 bottom-0">
         <!--    LG NAV  -->
         <div
-          class="hidden lg:flex h-screen flex-col items-start justify-between border-e bg-white"
-          style="
-            @media screen and (max-width: 600px) {
-              visibility: hidden !important;
-            }
-          "
+          class="hidden lg:flex min-h-screen flex-col bg-clip-padding backdrop-filter backdrop-blur-lg border-2 border-gray-100 justify-between border-e bg-white"
         >
           <div class="px-4 py-6">
             <span
@@ -52,26 +47,26 @@
             >
               Logo
             </span>
-
+  
             <ul class="mt-6 space-y-1 pb-2 border-b">
               <li>
                 <a
                   href="/acasa"
-                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  class="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
                 >
                   Acasa
                 </a>
               </li>
-
+  
               <li>
                 <a
                   href="/tranzactii"
-                  class="block rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                 >
                   Tranzactii
                 </a>
               </li>
-
+  
               <li>
                 <a
                   href="/salariati"
@@ -80,8 +75,33 @@
                   Salariati
                 </a>
               </li>
+  
+              <li>
+                <a
+                  href="/inventar"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Inventar
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/flota/"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Flota
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/grafice/"
+                  class="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  Grafice
+                </a>
+              </li>
             </ul>
-
+  
             <div class="border-t">
               <a
                 href="/upload"
@@ -89,7 +109,7 @@
                 id="uploadDocument"
               >
                 <span class="text-sm font-medium"> Incarca document </span>
-
+  
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="icon icon-tabler icon-tabler-upload"
@@ -111,10 +131,10 @@
             </div>
           </div>
         </div>
-
+  
         <!--    MD NAV  -->
         <div
-          class="lg:hidden flex h-screen w-16 flex-col items-start justify-between border-e bg-white"
+          class="lg:hidden flex min-h-screen w-16 flex-col justify-between border-e bg-white"
         >
           <div>
             <div class="inline-flex h-16 w-16 items-center justify-center">
@@ -124,13 +144,13 @@
                 L
               </span>
             </div>
-
+  
             <div class="border-t border-gray-100">
               <div class="px-2">
                 <div class="py-4">
                   <a
                     href="/acasa"
-                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    class="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +169,7 @@
                       <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
                       <path d="M10 12h4v4h-4z" />
                     </svg>
-
+  
                     <span
                       class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
                     >
@@ -157,12 +177,12 @@
                     </span>
                   </a>
                 </div>
-
+  
                 <ul class="space-y-1 border-t border-b border-gray-100 py-4">
                   <li>
                     <a
                       href="/tranzactii"
-                      class="t group relative flex justify-center rounded bg-blue-50 px-2 py-1.5 text-blue-700"
+                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +209,7 @@
                         <path d="M9 13l6 0"></path>
                         <path d="M13 17l2 0"></path>
                       </svg>
-
+  
                       <span
                         class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
                       >
@@ -197,7 +217,7 @@
                       </span>
                     </a>
                   </li>
-
+  
                   <li>
                     <a
                       href="/salariati"
@@ -227,7 +247,7 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                         <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
                       </svg>
-
+  
                       <span
                         class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
                       >
@@ -235,47 +255,93 @@
                       </span>
                     </a>
                   </li>
-
+  
                   <li>
-                    <a
-                      href="/inventar"
-                      class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="icon icon-tabler icon-tabler-file-invoice"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
+                  <a
+                    href="/inventar"
+                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="20.5" r="1"/><circle cx="18" cy="20.5" r="1"/><path d="M2.5 2.5h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6l1.6-8.4H7.1"/></svg>
+                      <path
+                        stroke="none"
+                        d="M0 0h24v24H0z"
                         fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                        <path
-                          d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
-                        ></path>
-                        <path d="M9 7l1 0"></path>
-                        <path d="M9 13l6 0"></path>
-                        <path d="M13 17l2 0"></path>
-                      </svg>
-
-                      <span
-                        class="absolute pointer-events-none start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
-                      >
-                        Inventar
-                      </span>
-                    </a>
-                  </li>
+                      ></path>
+                      <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                      <path
+                        d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      ></path>
+                      <path d="M9 7l1 0"></path>
+                      <path d="M9 13l6 0"></path>
+                      <path d="M13 17l2 0"></path>
+                    </svg>
+  
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Inventar
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/flota/"
+                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2 6.3-6.4 2.1 2-6.3z"/></svg>
+                      <path
+                        stroke="none"
+                        d="M0 0h24v24H0z"
+                        fill="none"
+                      ></path>
+                      <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                      <path
+                        d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      ></path>
+                      <path d="M9 7l1 0"></path>
+                      <path d="M9 13l6 0"></path>
+                      <path d="M13 17l2 0"></path>
+                    </svg>
+  
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Flota
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/grafice/"
+                    class="group relative flex justify-center rounded px-2 py-1.5 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+                      <path
+                        stroke="none"
+                        d="M0 0h24v24H0z"
+                        fill="none"
+                      ></path>
+                      <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                      <path
+                        d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      ></path>
+                      <path d="M9 7l1 0"></path>
+                      <path d="M9 13l6 0"></path>
+                      <path d="M13 17l2 0"></path>
+                    </svg>
+  
+                    <span
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                    >
+                      Grafice
+                    </span>
+                  </a>
+                </li>
+  
+  
                 </ul>
-
+  
+  
                 <div class="border-t py-4">
                   <a
                     href="/upload"
@@ -301,7 +367,7 @@
                       <path d="M7 9l5 -5l5 5"></path>
                       <path d="M12 4l0 12"></path>
                     </svg>
-
+  
                     <span
                       class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
                     >
