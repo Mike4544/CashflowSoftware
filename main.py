@@ -105,7 +105,7 @@ async def inventar():
 
     return await render_template(
         'inventar.html',
-        angajati=angajati
+        salariati=angajati
     )
 
 @app.route('/inventar/<int:id>')

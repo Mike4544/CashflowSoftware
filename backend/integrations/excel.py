@@ -13,5 +13,36 @@ def __get_data_from_excel(file: str) -> list:
     """
     Get data from an excel file
     """
-    print("!!!  Not implemented yet - TEST DATA  !!!")
-    return DEFAULT_DATA
+    import csv
+
+    ret_data = []
+
+    with open(file, 'r', newline='') as fisier:
+        cititor = csv.reader(fisier)
+        verif = False
+        prim = False
+        for rand in cititor:
+            if rand and len(rand) > 0:
+                for el in rand:
+                    if el == "Sold contabil":
+                        verif = True
+                        prim = True
+                if verif and not prim:
+                    data = tuple(map(int, rand[0].split('-')[::-1]))
+                    nume = rand[2]
+                    intrari_verif = False
+                    if rand[4] == '':
+                        suma = rand[5]
+                        intrari_verif = True
+                    else:
+                        suma = rand[4]
+                    suma_str = suma.replace(',', '')
+                    tva = float(suma_str)
+                    if intrari_verif:
+                        ret_data.append([data, nume, tva, 'intrare'])
+                    else:
+                        ret_data.append([data, nume, tva, 'iesire'])
+
+                if verif and prim:
+                    prim = False
+    return ret_data

@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   
       // Închide modalul după adăugarea datelor
       $('#addEmployeeModal').style = "display: none";
+      $('#addEmployeeModal').modal('hide');
   
       // Resetează valorile câmpurilor de input din modal
 
@@ -91,6 +92,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             // Găsește toate câmpurile de input din modalul de editare
             var inputFields = document.querySelectorAll("#editEmployeeModal input");
+
+            // Găsește toate celulele din rândul tabelului
+            var cells = row.querySelectorAll("td");
 
             // Populează câmpurile cu valorile din rândul tabelului
             for (var i = 0; i < inputFields.length; i++) {
@@ -164,7 +168,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
 
-    var confirmDelete = document.querySelector("#deleteEmployeeModal .btn-success");
+    var confirmDelete = document.querySelector("#deleteEmployeeModal .btn-danger");
 
     confirmDelete.addEventListener("click", async function () {
 
@@ -187,5 +191,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       else {
         console.log('Error!');
       }
+
+      // Închide modalul de editare după salvare
+      $('#deleteEmployeeModal').modal('hide');
     });
 });

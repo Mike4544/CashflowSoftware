@@ -299,7 +299,7 @@ async def get_salarii_sum():
 async def get_inventar():
     json_data = await request.get_json()
 
-    raw_data = await cAPI.get_inventar_angajat(
+    raw_data = await cAPI.get_inventar(
         angajat=json_data['angajatID']
     )
 

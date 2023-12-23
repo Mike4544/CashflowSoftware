@@ -848,13 +848,13 @@ async def get_iesiri(
         # In a 10-a a lunii, add 1/3 of the salaries to the total
         third = sum / 3
         entries.append(
-            (-99, 'Iesire', False,  10, luna or datetime.now().month, an or datetime.now().year, 'Salarii', third, 0,
+            (-99, 'Iesire', True,  10, luna or datetime.now().month, an or datetime.now().year, 'Salarii', third, 0,
              sum / 3)
         )
 
         # In a 25-a a lunii, add 2/3 of the salaries to the total
         entries.append(
-            (-99, 'Iesire', False, 25, luna or datetime.now().month, an or datetime.now().year, 'Salarii', 2 * third, 0,
+            (-99, 'Iesire', True, 25, luna or datetime.now().month, an or datetime.now().year, 'Salarii', 2 * third, 0,
              sum * 2 / 3)
         )
 
