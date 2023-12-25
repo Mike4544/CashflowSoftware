@@ -547,6 +547,7 @@ async def add_date():
         })
 
     except Exception as e:
+        print(e)
         return jsonify({
             "status": "Error"
         })

@@ -28,7 +28,7 @@ def __get_data_from_excel(file: str) -> list:
                         verif = True
                         prim = True
                 if verif and not prim:
-                    data = tuple(map(int, rand[0].split('-')[::-1]))
+                    data = "-".join(rand[0].split('-')[::-1])
                     nume = rand[2]
                     intrari_verif = False
                     if rand[4] == '':

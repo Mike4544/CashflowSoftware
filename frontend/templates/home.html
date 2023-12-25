@@ -18,6 +18,7 @@
     <script src="{{ url_for('static', filename='js/components/button.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/spinner.js') }}"></script>
     <script src="{{ url_for('static', filename='js/components/icons.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/parseMoney.js') }}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
@@ -166,7 +167,7 @@
                     </svg>
 
                     <span
-                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                     >
                       Acasa
                     </span>
@@ -206,7 +207,7 @@
                       </svg>
 
                       <span
-                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                       >
                         Tranzactii
                       </span>
@@ -244,7 +245,7 @@
                       </svg>
 
                       <span
-                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                        class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                       >
                         Salariati
                       </span>
@@ -272,7 +273,7 @@
                     </svg>
 
                     <span
-                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                     >
                       Inventar
                     </span>
@@ -299,7 +300,7 @@
                     </svg>
 
                     <span
-                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                     >
                       Flota
                     </span>
@@ -326,7 +327,7 @@
                     </svg>
 
                     <span
-                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                     >
                       Grafice
                     </span>
@@ -364,7 +365,7 @@
                     </svg>
 
                     <span
-                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100"
+                      class="absolute start-full top-1/2 ms-4 -translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100 pointer-events-none"
                     >
                       Incarca document
                     </span>
@@ -948,9 +949,9 @@
             let recents = data[1];
             let conturi = data[2];
 
-            statsBalanta.update(parseFloat(balanta).toFixed(2) + " RON");
-            statsIntrari.update(parseFloat(data[0][0]).toFixed(2)  + " RON");
-            statsIesiri.update(parseFloat(data[0][1]).toFixed(2) + " RON");
+            statsBalanta.update(toMoney(balanta) + " RON");
+            statsIntrari.update(toMoney(data[0][0]) + " RON");
+            statsIesiri.update(toMoney(data[0][1]) + " RON");
 
             recentsTable.update(recents);
             contBancarTable.update(conturi);

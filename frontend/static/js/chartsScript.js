@@ -138,9 +138,6 @@ function setupTable(chart) {
         <button onclick="addData('${chartId}')" class="btn btn-success m-1">Adaugă Date</button>
       </div>
       <div class="col-md-4">
-        <button onclick="deleteData('${chartId}')" class="btn btn-danger m-1">Șterge Datele</button>
-      </div>
-      <div class="col-md-4">
         <button onclick="deleteChart('${chartId}')" class="btn btn-danger m-1">Șterge Grafic</button>
       </div>
     `;
