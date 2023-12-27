@@ -20,7 +20,7 @@ class StatsContainer {
 
         var tempDiv = document.createElement('div');
         const innerHTML = `
-        <div class="stats-container mr-7 my-5 p-3 h-16 lg:h-20 w-42 lg:w-48 bg-${color} rounded-xl shadow-md">
+        <div class="stats-container mr-7 my-5 p-3 h-16 lg:h-20 w-1/2 bg-${color} rounded-xl shadow-md">
             <h3 id="stats-container__title" class="text-xs text-ellipsis font-medium tracking-wide text-white opacity-75">${name}</h3>
             <h3 id="stats-container__value" class="text-2xl font-bold text-white">${initVal}</h3>
         
