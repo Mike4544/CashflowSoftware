@@ -743,6 +743,8 @@
             let currentYear =
               anInput.value === "" ? new Date().getFullYear() : anInput.value;
 
+
+
             let addEntry = (key) => {
               //  Create a static table for the dropdown
               let staticTable = new StaticTable(["Firma", "Valori"], [], false);
@@ -794,24 +796,16 @@
 
                             let newData = staticTable.entries;
                             
-                            newData = [...newData]
-
-                            let temp = Array();
-                            for(let _entry of newData) {
-                              if(_entry[0] === firma && _entry[1] === entry) {
-                                temp.push(_entry);
-                              }
-                            }
-
-                            newData = temp;
-                            
+                            console.log("NEW DATA: ", newData);
                             
                             for(let i = 0; i < newData.length; i++) {
-                              if(newData[i][0] === firma && newData[i][1] === entry) {
+                              if(newData[i][0].innerHTML == firma && newData[i][1].innerHTML == entry) {
                                 newData.splice(i, 1);
                                 break;
                               }
                             }
+
+                            console.log(newData);
 
                             async function _serverCallback() {
                               let data = {
