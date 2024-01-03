@@ -32,10 +32,10 @@ def __get_data_from_excel(file: str) -> list:
                     nume = rand[2]
                     intrari_verif = False
                     if rand[4] == '':
-                        suma = rand[5]
+                        suma = str(abs(float(rand[5].replace(',', ''))))
                         intrari_verif = True
                     else:
-                        suma = rand[4]
+                        suma = str(abs(float(rand[4].replace(',', ''))))
                     suma_str = suma.replace(',', '')
                     tva = float(suma_str)
                     if intrari_verif:

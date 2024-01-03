@@ -765,9 +765,9 @@
 
                     // Make the element based on if it's urgent or not
                     let nameElement = document.createElement("span");
-                    nameElement.innerHTML = (firma.length > 40 ? firma.substring(0, 40) + "..." : firma);
                     nameElement.classList.add("font-medium");
                     nameElement.title = firma;
+                    nameElement.innerHTML = (firma.length > 40 ? firma.substring(0, 40) + "..." : firma);
 
                     if(isUrgent) {
                       nameElement.classList.add("text-red-500");
@@ -799,7 +799,7 @@
                             console.log("NEW DATA: ", newData);
                             
                             for(let i = 0; i < newData.length; i++) {
-                              if(newData[i][0].innerHTML == firma && newData[i][1].innerHTML == entry) {
+                              if(firma.includes(newData[i][0].innerText.replace("...", "")) && newData[i][1].innerHTML == entry) {
                                 newData.splice(i, 1);
                                 break;
                               }
@@ -1000,6 +1000,8 @@
               }
 
               let dayTotal = _intrare - _iesire;
+
+              //  console.log(`Zi ${day}\tIntari ${_intrare}\tIesire ${_iesire}\tDayTotal ${dayTotal}`);
 
               totalDays.push([dayTotal]);
               updatedData.push([`<b>${dayTotal} RON</b>`]);

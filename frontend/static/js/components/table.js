@@ -175,11 +175,11 @@ class StaticTable {
          //  Create the body rows
          for(let entry in this.entries) {
             let tr = document.createElement('tr');
-            tr.className = 'h-14';
+            tr.className = 'h-14 w-full';
             //  Create the body cells
             for(let cell in this.entries[entry]) {
                 let td = document.createElement('td');
-                td.classList = "whitespace-nowrap px-4 py-2 text-gray-700";
+                td.classList = "whitespace-nowrap px-4 py-2 max-w-1/2 text-elipsis overflow-hidden text-gray-700";
                 // Append the HTML element
                 try {
                     td.appendChild(this.entries[entry][cell]);
@@ -221,12 +221,12 @@ class StaticTable {
         for(let entry in data) {
             console.log("ENTRY:", data[entry]);
             let tr = document.createElement('tr');
-            tr.className = 'h-14';
+            tr.className = 'h-14 w-full';
             //  Create the body cells
             for(let cell in data[entry]) {
                 console.log("CELL:", data[entry][cell]);
                 let td = document.createElement('td');
-                td.classList = "whitespace-nowrap px-4 py-2 text-gray-700";
+                td.classList = "whitespace-nowrap px-4 py-2 max-w-1/2 text-elipsis overflow-hidden text-gray-700";
                 // Append the HTML element
                 try {
                     td.appendChild(data[entry][cell]);
