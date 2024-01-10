@@ -1,1 +1,0 @@
-{"id": "chart-2", "type": "bar", "data": {"labels": [], "datasets": [{"label": "bar Chart", "data": [], "backgroundColor": "rgba(255, 99, 132, 0.2)", "borderColor": "rgba(255, 99, 132, 1)", "borderWidth": 1}]}, "options": {"responsive": true, "scales": {"x": {"beginAtZero": true}, "y": {"beginAtZero": true}}}}
