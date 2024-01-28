@@ -1,4 +1,5 @@
 from quart import Quart, request, jsonify, render_template
+
 from backend.flask_api import (
     api_routes,
     __get_angajati,
@@ -11,19 +12,60 @@ import backend.chartsAPI as chartsAPI
 from backend.authAPI import auth_api
 from datetime import datetime
 
+from functools import wraps
+
 app = Quart(__name__, static_folder="frontend/static", template_folder="frontend/templates")
 app.register_blueprint(api_routes)
 app.register_blueprint(auth_api)
 app.register_blueprint(chartsAPI.charts_api)
 
 
+async def __login():
+    # If the cookies are not authed, prompt a login alert
+    return """
+               <script>
+                let password = prompt('Parola');
+
+                  const response = fetch('/api/access', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify({
+                           password: password
+                       })
+                   }).then(res => res.json())
+                   .then(data => {
+                       if (data.status === 'success') {
+                           location.reload();
+                       } else {
+                           alert('Parola incorecta');
+                       }
+                   });
+               </script>
+               """
+
+
+def authorize(func):
+    @wraps(func)
+    async def login_wrapper():
+        if not request.cookies.get('logged'):
+            return await __login()
+
+        return await func()
+
+    return login_wrapper
+
+
 @app.route('/')
 @app.route('/acasa')
+@authorize
 async def home():
     return await render_template('home.html')
 
 
 @app.route('/tranzactii')
+@authorize
 async def tranzactii():
     return await render_template(
         'tranzactii.html',
@@ -33,6 +75,7 @@ async def tranzactii():
 
 
 @app.route('/salariati')
+@authorize
 async def salariati():
     # If the cookies are not authed, prompt a login alert
     if not request.cookies.get('authed'):
@@ -67,6 +110,7 @@ async def salariati():
 
 
 @app.route('/salariat/<int:id>')
+@authorize
 async def salariat(id):
     angajat = await __get_angajat(id=id)
     print(angajat)
@@ -99,6 +143,7 @@ async def salariat(id):
         )
 
 @app.route('/inventar/')
+@authorize
 async def inventar():
 
     angajati = await __get_angajati()
@@ -109,6 +154,7 @@ async def inventar():
     )
 
 @app.route('/inventar/<int:id>')
+@authorize
 async def inventar_angajat(id):
     angajat = await __get_angajat(id=id)
     inventar= await __get_inventar(id)
@@ -127,6 +173,7 @@ async def inventar_angajat(id):
         )
 
 @app.route('/flota/')
+@authorize
 async def flota():
     masini = await __get_flota()
     return await render_template(
@@ -135,6 +182,7 @@ async def flota():
     )
 
 @app.route("/grafice/")
+@authorize
 async def grafice():
     return await render_template(
         'charts.html',
@@ -142,6 +190,7 @@ async def grafice():
     )
 
 @app.route('/upload')
+@authorize
 async def upload():
     integrari_default = [
         {
